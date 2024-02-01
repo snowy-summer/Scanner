@@ -18,18 +18,16 @@ final class MainView: UIView {
     
     weak var delegate: MainViewDelegate?
     
-    init(mainViewdelegate: MainViewDelegate?) {
+    init() {
         super.init(frame: .zero)
-//        self.backgroundColor = .white
         
-        delegate = mainViewdelegate
         configureCameraView()
         configureCaptureButton()
         configureSaveButton()
         configureThumbnailView()
         configureImageCountView()
         configureImageCountLabel()
-      
+        
     }
     
     required init?(coder: NSCoder) {
@@ -120,7 +118,7 @@ extension MainView {
         imageCountView.backgroundColor = #colorLiteral(red: 0.9529411793, green: 0.6862745285, blue: 0.1333333403, alpha: 1)
         
         imageCountView.translatesAutoresizingMaskIntoConstraints = false
-    
+        
         let imageCountViewConstraint = [
             imageCountView.widthAnchor.constraint(equalTo: thumbnailView.widthAnchor, multiplier: 0.4),
             imageCountView.heightAnchor.constraint(equalTo: imageCountView.widthAnchor, multiplier: 1.0)
@@ -136,7 +134,7 @@ extension MainView {
         }
         
         imageCountView.isHidden = true
-
+        
     }
     
     private func configureImageCountLabel() {
@@ -164,23 +162,22 @@ extension MainView {
 extension MainView {
     @objc private func pushCaptureButton() {
         delegate?.pushCaptureButton()
-        
     }
     
     @objc private func pushSaveButton() {
         delegate?.pushSaveButton()
     }
     
-    
-   
-    
     func updateThumbnail(image: UIImage, imagesCount: Int) {
         thumbnailView.image = image
-        imageCountLabel.text = "\(imagesCount)"
+        
         if imagesCount > 0 {
-            imageCountLabel.isHidden = false
+            imageCountView.isHidden = false
         } else {
-            imageCountLabel.isHidden = true
+            imageCountView.isHidden = true
         }
+        
+        imageCountLabel.text = "\(imagesCount)"
+        
     }
 }

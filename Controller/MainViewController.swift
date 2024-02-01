@@ -1,29 +1,28 @@
 //
-//  ViewController.swift
+//  MainViewController.swift
 //  Scanner
 //
 //  Created by 최승범 on 2024/01/31.
 //
 
 import UIKit
-import CoreImage
 import AVFoundation
 
-final class ViewController: UIViewController {
-    private var mainView: MainView!
+final class MainViewController: UIViewController {
+    private var mainView = MainView()
     
     private var captureSession: AVCaptureSession!
     private var previewLayer: AVCaptureVideoPreviewLayer!
     private var photoOutput: AVCapturePhotoOutput!
   
     override func loadView() {
-        mainView = MainView(mainViewdelegate: self)
         view = mainView
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .darkGray
+        mainView.delegate = self
         
         let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(cancelAction))
         cancelButton.tintColor = .white
@@ -49,42 +48,12 @@ final class ViewController: UIViewController {
     }
 
     @objc private func cancelAction() {
-
+        ScanServiceProvider.shared.clearImages()
+        mainView.updateThumbnail(image: UIImage(), imagesCount: 0)
     }
 }
 
-extension ViewController {
-    
-    func detectRectangleAndCorrectPerspective(image: UIImage) -> UIImage? {
-        guard let ciImage = CIImage(image: image) else { return nil }
-        
-        // Detector 생성
-        let options: [String: Any] = [
-            CIDetectorAccuracy: CIDetectorAccuracyHigh,
-            CIDetectorMinFeatureSize: NSNumber(floatLiteral: 0.2)
-        ]
-        guard let detector = CIDetector(ofType: CIDetectorTypeRectangle,
-                                        context: nil,
-                                        options: options) else { return nil }
-        
-        // Detect rectangles
-        let features = detector.features(in: ciImage)
-        guard let rectangleFeature = features.first as? CIRectangleFeature else { return nil }
-        
-        // Correct perspective
-        let perspectiveCorrection = CIFilter(name: "CIPerspectiveCorrection")
-        perspectiveCorrection?.setValue(CIVector(cgPoint: rectangleFeature.topLeft), forKey: "inputTopLeft")
-        perspectiveCorrection?.setValue(CIVector(cgPoint: rectangleFeature.topRight), forKey: "inputTopRight")
-        perspectiveCorrection?.setValue(CIVector(cgPoint: rectangleFeature.bottomRight), forKey: "inputBottomRight")
-        perspectiveCorrection?.setValue(CIVector(cgPoint: rectangleFeature.bottomLeft), forKey: "inputBottomLeft")
-        perspectiveCorrection?.setValue(ciImage, forKey: kCIInputImageKey)
-        
-        guard let outputImage = perspectiveCorrection?.outputImage else { return nil }
-        let context = CIContext(options: nil)
-        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
-        
-        return UIImage(cgImage: cgImage)
-    }
+extension MainViewController {
     
     //MARK: - AVFoundation configuration
     private func configureCaptureSassion() {
@@ -131,7 +100,7 @@ extension ViewController {
     }
 }
 
-extension ViewController: MainViewDelegate {
+extension MainViewController: MainViewDelegate {
     func pushSaveButton() {
         navigationController?.pushViewController(PreviewController(), animated: true)
     }
@@ -143,11 +112,13 @@ extension ViewController: MainViewDelegate {
     
 }
 
-extension ViewController: AVCapturePhotoCaptureDelegate {
+extension MainViewController: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let imageData = photo.fileDataRepresentation() else { return }
         let originalImage = UIImage(data: imageData)
         
+        ScanServiceProvider.shared.getImage(image: originalImage!)
+        mainView.updateThumbnail(image: originalImage!, imagesCount:  ScanServiceProvider.shared.imagesCount())
     }
     
 }

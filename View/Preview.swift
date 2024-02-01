@@ -14,6 +14,8 @@ final class Preview: UIView {
     private let finishButton = UIButton()
     private let imageView = UIImageView()
     
+    weak var delegate: PreviewDelegate?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureImageView()
@@ -26,7 +28,7 @@ final class Preview: UIView {
     required init?(coder: NSCoder) {
         fatalError("Preview 생성오류")
     }
-
+    
 }
 
 extension Preview {
@@ -40,7 +42,7 @@ extension Preview {
         deleteButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-    
+            
             deleteButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
             deleteButton.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.08),
             deleteButton.widthAnchor.constraint(equalTo: deleteButton.heightAnchor, multiplier: 1.0),
@@ -49,10 +51,11 @@ extension Preview {
         
     }
     
-   private func configureEditButton() {
+    private func configureEditButton() {
         let buttonSymbol = UIImage.SymbolConfiguration(pointSize: 20, weight: .light)
         editButton.setImage(UIImage(systemName: "crop", withConfiguration: buttonSymbol), for: .normal)
         editButton.tintColor = .black
+        editButton.addTarget(self, action: #selector(pushEditButton), for: .touchUpInside)
         
         self.addSubview(editButton)
         
@@ -68,7 +71,7 @@ extension Preview {
         ])
     }
     
-   private func configureFinishButton() {
+    private func configureFinishButton() {
         finishButton.setTitle("반시계", for: .normal)
         finishButton.setTitleColor(.black, for: .normal)
         
@@ -95,7 +98,13 @@ extension Preview {
             imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             imageView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.75)
         ])
-        
     }
     
+    func updateImageView(image: UIImage) {
+        imageView.image = image
+    }
+    
+    @objc private func pushEditButton() {
+        delegate?.pushEditButton()
+    }
 }

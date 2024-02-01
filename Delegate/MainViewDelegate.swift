@@ -11,4 +11,3 @@ protocol MainViewDelegate: AnyObject {
     func pushSaveButton()
     func pushCaptureButton()
 }
-
