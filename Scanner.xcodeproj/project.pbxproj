@@ -88,10 +88,18 @@
 			isa = PBXGroup;
 			children = (
 				6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */,
+				6B4E5EF22B6CD3DA00229F1D /* Detector */,
+			);
+			path = ScanService;
+			sourceTree = "<group>";
+		};
+		6B4E5EF22B6CD3DA00229F1D /* Detector */ = {
+			isa = PBXGroup;
+			children = (
 				6B4E5EF02B6CCBE400229F1D /* RectangleDetector.swift */,
 				6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */,
 			);
-			path = ScanService;
+			path = Detector;
 			sourceTree = "<group>";
 		};
 		6BC24CA72B6B3ADA0078EAB9 /* View */ = {

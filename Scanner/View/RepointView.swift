@@ -33,7 +33,7 @@ extension RepointView {
             imageView.topAnchor.constraint(equalTo: safeArea.topAnchor),
             imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+            imageView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(cameraViewConstraint)

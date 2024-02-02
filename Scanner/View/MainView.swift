@@ -39,7 +39,7 @@ extension MainView {
     private func configureCameraView() {
         self.addSubview(cameraView)
         cameraView.translatesAutoresizingMaskIntoConstraints = false
-        cameraView.backgroundColor = .white
+        cameraView.backgroundColor = .clear
         
         let safeArea = self.safeAreaLayoutGuide
         let cameraViewConstraint = [
@@ -47,6 +47,7 @@ extension MainView {
             cameraView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             cameraView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             cameraView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.75)
+//            cameraView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(cameraViewConstraint)
@@ -56,7 +57,7 @@ extension MainView {
         let buttonSymbol = UIImage.SymbolConfiguration(pointSize: 60, weight: .regular)
         captureButton.setImage(UIImage(systemName: "camera.aperture", withConfiguration: buttonSymbol), for: .normal)
         captureButton.addTarget(self, action: #selector(pushCaptureButton), for: .touchUpInside)
-        captureButton.tintColor = .black
+        captureButton.tintColor = .white
         
         self.addSubview(captureButton)
         captureButton.translatesAutoresizingMaskIntoConstraints = false
@@ -73,7 +74,7 @@ extension MainView {
     
     private func configureSaveButton() {
         saveButton.setTitle("저장", for: .normal)
-        saveButton.setTitleColor(.black, for: .normal)
+        saveButton.setTitleColor(.white, for: .normal)
         saveButton.addTarget(self, action: #selector(pushSaveButton), for: .touchUpInside)
         
         self.addSubview(saveButton)
@@ -89,10 +90,10 @@ extension MainView {
     }
     
     private func configureThumbnailView() {
-        thumbnailView.image = UIImage(named: "ipad")
         
         self.addSubview(thumbnailView)
         thumbnailView.translatesAutoresizingMaskIntoConstraints = false
+        thumbnailView.backgroundColor = .white
         
         let thumbnailViewConstraint = [
             
