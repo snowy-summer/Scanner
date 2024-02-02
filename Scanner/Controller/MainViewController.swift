@@ -14,7 +14,7 @@ final class MainViewController: UIViewController {
     private var captureSession: AVCaptureSession!
     private var previewLayer: AVCaptureVideoPreviewLayer!
     private var photoOutput: AVCapturePhotoOutput!
-  
+    
     override func loadView() {
         view = mainView
     }
@@ -28,12 +28,11 @@ final class MainViewController: UIViewController {
         cancelButton.tintColor = .white
         navigationItem.leftBarButtonItem = cancelButton
         navigationController?.navigationBar.tintColor = .black
-
+        
         configureCaptureSassion()
         configurePreviewLayer()
         configurePhotoOutput()
         
-        // 캡처 세션 시작
         Thread.detachNewThread { [weak self] in
             self?.captureSession.startRunning()
         }
@@ -46,28 +45,23 @@ final class MainViewController: UIViewController {
     deinit {
         captureSession.stopRunning()
     }
-
+    
     @objc private func cancelAction() {
         ScanServiceProvider.shared.clearImages()
         mainView.updateThumbnail(image: UIImage(), imagesCount: 0)
     }
 }
-
+//MARK: - AVFoundation configuration
 extension MainViewController {
-    
-    //MARK: - AVFoundation configuration
     private func configureCaptureSassion() {
-        // AVCaptureSession 생성
         captureSession = AVCaptureSession()
         captureSession.sessionPreset = .high
         
-        // 후면 카메라를 가져옴
         guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             print("카메라를 사용할 수 없습니다.")
             return
         }
         
-        // 후면 카메라를 입력으로 사용
         do {
             let input = try AVCaptureDeviceInput(device: backCamera)
             if captureSession.canAddInput(input) {
@@ -83,7 +77,6 @@ extension MainViewController {
     }
     
     private func configurePreviewLayer() {
-        // 프리뷰 레이어 생성
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.videoGravity = .resizeAspectFill
         mainView.addCameraViewLayer(subLayer: previewLayer)

@@ -10,6 +10,10 @@
 		6B10A5042B6BB92600E03E18 /* RepointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10A5032B6BB92600E03E18 /* RepointView.swift */; };
 		6B10A5062B6BBC5C00E03E18 /* RepointViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10A5052B6BBC5C00E03E18 /* RepointViewController.swift */; };
 		6B10A5082B6BC71400E03E18 /* PreviewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10A5072B6BC71400E03E18 /* PreviewDelegate.swift */; };
+		6B4E5EE72B6C78A200229F1D /* UIImage++Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EE62B6C78A200229F1D /* UIImage++Extension.swift */; };
+		6B4E5EEA2B6C8B4B00229F1D /* ScannerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EE92B6C8B4B00229F1D /* ScannerError.swift */; };
+		6B4E5EEE2B6CCB0200229F1D /* CIFilterKeyName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */; };
+		6B4E5EF12B6CCBE400229F1D /* RectangleDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EF02B6CCBE400229F1D /* RectangleDetector.swift */; };
 		6BC24CA92B6B3B020078EAB9 /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC24CA82B6B3B020078EAB9 /* Preview.swift */; };
 		6BC24CAD2B6BA5300078EAB9 /* MainViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC24CAC2B6BA5300078EAB9 /* MainViewDelegate.swift */; };
 		6BC24CB12B6BAE190078EAB9 /* ScanServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */; };
@@ -26,6 +30,10 @@
 		6B10A5032B6BB92600E03E18 /* RepointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepointView.swift; sourceTree = "<group>"; };
 		6B10A5052B6BBC5C00E03E18 /* RepointViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepointViewController.swift; sourceTree = "<group>"; };
 		6B10A5072B6BC71400E03E18 /* PreviewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewDelegate.swift; sourceTree = "<group>"; };
+		6B4E5EE62B6C78A200229F1D /* UIImage++Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage++Extension.swift"; sourceTree = "<group>"; };
+		6B4E5EE92B6C8B4B00229F1D /* ScannerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerError.swift; sourceTree = "<group>"; };
+		6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIFilterKeyName.swift; sourceTree = "<group>"; };
+		6B4E5EF02B6CCBE400229F1D /* RectangleDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleDetector.swift; sourceTree = "<group>"; };
 		6BC24CA82B6B3B020078EAB9 /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		6BC24CAC2B6BA5300078EAB9 /* MainViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewDelegate.swift; sourceTree = "<group>"; };
 		6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanServiceProvider.swift; sourceTree = "<group>"; };
@@ -51,12 +59,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6B4E5EE82B6C78A700229F1D /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				6B4E5EE62B6C78A200229F1D /* UIImage++Extension.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		6B4E5EEB2B6C8D4400229F1D /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				6B4E5EE92B6C8B4B00229F1D /* ScannerError.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
+		6B4E5EEC2B6C8D7B00229F1D /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				6BEE74BC2B6A13FD009F36D2 /* AppDelegate.swift */,
+				6BEE74BE2B6A13FD009F36D2 /* SceneDelegate.swift */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
+		6B4E5EEF2B6CCB4E00229F1D /* ScanService */ = {
+			isa = PBXGroup;
+			children = (
+				6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */,
+				6B4E5EF02B6CCBE400229F1D /* RectangleDetector.swift */,
+				6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */,
+			);
+			path = ScanService;
+			sourceTree = "<group>";
+		};
 		6BC24CA72B6B3ADA0078EAB9 /* View */ = {
 			isa = PBXGroup;
 			children = (
 				6BEE74D02B6A2B49009F36D2 /* MainView.swift */,
 				6BC24CA82B6B3B020078EAB9 /* Preview.swift */,
 				6B10A5032B6BB92600E03E18 /* RepointView.swift */,
+				6BC24CAB2B6BA5030078EAB9 /* Delegate */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -83,10 +127,6 @@
 		6BEE74B02B6A13FC009F36D2 = {
 			isa = PBXGroup;
 			children = (
-				6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */,
-				6BC24CAB2B6BA5030078EAB9 /* Delegate */,
-				6BC24CAA2B6B7E1E0078EAB9 /* Controller */,
-				6BC24CA72B6B3ADA0078EAB9 /* View */,
 				6BEE74BB2B6A13FD009F36D2 /* Scanner */,
 				6BEE74BA2B6A13FD009F36D2 /* Products */,
 			);
@@ -103,11 +143,15 @@
 		6BEE74BB2B6A13FD009F36D2 /* Scanner */ = {
 			isa = PBXGroup;
 			children = (
-				6BEE74BC2B6A13FD009F36D2 /* AppDelegate.swift */,
-				6BEE74BE2B6A13FD009F36D2 /* SceneDelegate.swift */,
 				6BEE74C52B6A13FD009F36D2 /* Assets.xcassets */,
 				6BEE74C72B6A13FD009F36D2 /* LaunchScreen.storyboard */,
 				6BEE74CA2B6A13FD009F36D2 /* Info.plist */,
+				6B4E5EEC2B6C8D7B00229F1D /* Application */,
+				6B4E5EEF2B6CCB4E00229F1D /* ScanService */,
+				6BC24CAA2B6B7E1E0078EAB9 /* Controller */,
+				6BC24CA72B6B3ADA0078EAB9 /* View */,
+				6B4E5EEB2B6C8D4400229F1D /* Error */,
+				6B4E5EE82B6C78A700229F1D /* Extension */,
 			);
 			path = Scanner;
 			sourceTree = "<group>";
@@ -184,7 +228,11 @@
 			files = (
 				6BEE74C12B6A13FD009F36D2 /* MainViewController.swift in Sources */,
 				6BEE74D32B6A4DEB009F36D2 /* PreviewController.swift in Sources */,
+				6B4E5EEA2B6C8B4B00229F1D /* ScannerError.swift in Sources */,
+				6B4E5EF12B6CCBE400229F1D /* RectangleDetector.swift in Sources */,
+				6B4E5EEE2B6CCB0200229F1D /* CIFilterKeyName.swift in Sources */,
 				6B10A5062B6BBC5C00E03E18 /* RepointViewController.swift in Sources */,
+				6B4E5EE72B6C78A200229F1D /* UIImage++Extension.swift in Sources */,
 				6BC24CAD2B6BA5300078EAB9 /* MainViewDelegate.swift in Sources */,
 				6BEE74D12B6A2B49009F36D2 /* MainView.swift in Sources */,
 				6B10A5042B6BB92600E03E18 /* RepointView.swift in Sources */,

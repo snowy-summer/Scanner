@@ -27,18 +27,15 @@ final class MainView: UIView {
         configureThumbnailView()
         configureImageCountView()
         configureImageCountLabel()
-        
     }
     
     required init?(coder: NSCoder) {
         fatalError("Main View 오류")
     }
-    
 }
 
 //MARK: - configuration
 extension MainView {
-    
     private func configureCameraView() {
         self.addSubview(cameraView)
         cameraView.translatesAutoresizingMaskIntoConstraints = false
@@ -157,16 +154,6 @@ extension MainView {
     func cameraViewBounds() -> CGRect{
         return cameraView.bounds
     }
-}
-
-extension MainView {
-    @objc private func pushCaptureButton() {
-        delegate?.pushCaptureButton()
-    }
-    
-    @objc private func pushSaveButton() {
-        delegate?.pushSaveButton()
-    }
     
     func updateThumbnail(image: UIImage, imagesCount: Int) {
         thumbnailView.image = image
@@ -178,6 +165,16 @@ extension MainView {
         }
         
         imageCountLabel.text = "\(imagesCount)"
-        
+    }
+}
+
+//MARK: - objc Button Action
+extension MainView {
+    @objc private func pushCaptureButton() {
+        delegate?.pushCaptureButton()
+    }
+    
+    @objc private func pushSaveButton() {
+        delegate?.pushSaveButton()
     }
 }

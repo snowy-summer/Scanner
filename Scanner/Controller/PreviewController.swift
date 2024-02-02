@@ -15,10 +15,10 @@ final class PreviewController: UIViewController {
     override func viewDidLoad() {
         view.backgroundColor = .darkGray
         preview.delegate = self
-        
         preview.updateImageView(image: ScanServiceProvider.shared.readScannedImage())
     }
 }
+
 extension PreviewController: PreviewDelegate {
     func pushEditButton() {
         navigationController?.pushViewController(RepointViewController(), animated: true)

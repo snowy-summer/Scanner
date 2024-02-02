@@ -14,6 +14,7 @@ final class RepointViewController: UIViewController {
     override func loadView() {
         view = repointView
     }
+    
     override func viewDidLoad() {
         let image = ScanServiceProvider.shared.readOriginalImage()
         repointView.updateUI(image: image)
