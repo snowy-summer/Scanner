@@ -17,11 +17,16 @@ final class RepointViewController: UIViewController {
     
     override func viewDidLoad() {
         view.backgroundColor = .gray
+        navigationController?.navigationBar.isHidden = true
         let image = ScanServiceProvider.shared.readOriginalImage()
         repointView.updateUI(image: image)
         setupToolBarButton()
     }
-    
+}
+
+//MARK: - configuration
+
+extension RepointViewController {
     func setupToolBarButton() {
 
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
@@ -50,8 +55,11 @@ final class RepointViewController: UIViewController {
 
         toolbarItems = barItems
     }
-    
-    
+}
+
+//MARK: - objc Action method
+
+extension RepointViewController {
     @objc func doneAction() {
 
     }

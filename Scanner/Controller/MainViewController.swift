@@ -7,15 +7,14 @@
 
 import UIKit
 import AVFoundation
-import Vision
 
-final class MainViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+final class MainViewController: UIViewController {
     private var mainView = MainView()
-    var thumbnailImage = UIBarButtonItem()
-    //    let camera = Camera()
     private var captureSession: AVCaptureSession!
     private var previewLayer: AVCaptureVideoPreviewLayer!
     private var photoOutput: AVCapturePhotoOutput!
+    private let alphaLayer = CAShapeLayer()
+    private let scanServiceProvider = ScanServiceProvider.shared
     
     override func loadView() {
         view = mainView
@@ -23,6 +22,8 @@ final class MainViewController: UIViewController, AVCaptureVideoDataOutputSample
     
     override func viewWillLayoutSubviews() {
         previewLayer.frame = mainView.cameraViewBounds()
+        alphaLayer.removeFromSuperlayer()
+        previewLayer.addSublayer(alphaLayer)
     }
     
     override func viewDidLoad() {
@@ -38,7 +39,7 @@ final class MainViewController: UIViewController, AVCaptureVideoDataOutputSample
         configureCaptureSassion()
         configurePreviewLayer()
         configurePhotoOutput()
-        
+        configureVideoOutput()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -58,28 +59,72 @@ final class MainViewController: UIViewController, AVCaptureVideoDataOutputSample
         mainView.updateThumbnail(image: UIImage(), imagesCount: 0)
     }
 }
+//MARK: -
+extension MainViewController {
+    func drawRect(image: UIImage) {
+        do {
+            let viewSize = mainView.cameraViewBounds().size
+            let points = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
+            
+            drawRect(cgPoints: points)
+            
+        } catch {
+            print(error)
+        }
+    }
+
+    private func drawRect(cgPoints: [CGPoint]) {
+        let outLine = UIBezierPath()
+        outLine.move(to: cgPoints[0])
+        outLine.addLine(to: cgPoints[1])
+        outLine.addLine(to: cgPoints[2])
+        outLine.addLine(to: cgPoints[3])
+        outLine.addLine(to: cgPoints[0])
+        
+        alphaLayer.path = outLine.cgPath
+        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
+        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
+        alphaLayer.lineWidth = 4
+    }
+    
+    
+}
+
+//MARK: - MainViewDelegate
+extension MainViewController: MainViewDelegate {
+    
+    func pushSaveButton() {
+        navigationController?.pushViewController(PreviewController(), animated: true)
+    }
+    
+    func pushCaptureButton() {
+        let settings = AVCapturePhotoSettings()
+        photoOutput.capturePhoto(with: settings, delegate: self)
+    }
+}
+
 //MARK: - AVFoundation configuration
 extension MainViewController {
+    
     private func configureCaptureSassion() {
-        captureSession = AVCaptureSession()
-        captureSession.sessionPreset = .high
-        
-        guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
-            print("카메라를 사용할 수 없습니다.")
-            return
-        }
-        
         do {
+            captureSession = AVCaptureSession()
+            captureSession.sessionPreset = .high
+            
+            guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera,
+                                                           for: .video,
+                                                           position: .back) else {
+                throw CameraError.cantAddBackCamera
+            }
+            
             let input = try AVCaptureDeviceInput(device: backCamera)
             if captureSession.canAddInput(input) {
                 captureSession.addInput(input)
             } else {
-                print("입력을 추가할 수 없습니다.")
-                return
+                throw CameraError.cantAddDeviceInput
             }
         } catch {
-            print("카메라 입력을 생성할 수 없습니다: \(error)")
-            return
+            print(error)
         }
     }
     
@@ -90,106 +135,59 @@ extension MainViewController {
     }
     
     private func configurePhotoOutput() {
-        photoOutput = AVCapturePhotoOutput()
-        if captureSession.canAddOutput(photoOutput) {
-            captureSession.addOutput(photoOutput)
-        } else {
-            print("출력을 추가할 수 없습니다.")
-            return
-        }
-    }
-}
-
-extension MainViewController: MainViewDelegate {
-    func pushSaveButton() {
-        navigationController?.pushViewController(PreviewController(), animated: true)
-    }
-    
-    func pushCaptureButton() {
-        let settings = AVCapturePhotoSettings()
-        photoOutput.capturePhoto(with: settings, delegate: self)
-    }
-    
-}
-
-extension MainViewController: AVCapturePhotoCaptureDelegate {
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard let imageData = photo.fileDataRepresentation() else { return }
-        let originalImage = UIImage(data: imageData)
-        ScanServiceProvider.shared.getImage(image: originalImage!)
-        mainView.updateThumbnail(image: originalImage!, imagesCount:  ScanServiceProvider.shared.imagesCount())
-    }
-    
-}
-
-final class Camera: NSObject {
-    private var captureSession: AVCaptureSession!
-    private var previewLayer: AVCaptureVideoPreviewLayer!
-    private var photoOutput: AVCapturePhotoOutput!
-    
-    override init() {
-        super.init()
-        configureCaptureSassion()
-        configurePhotoOutput()
-        configurePreviewLayer()
-    }
-    
-    deinit {
-        print("a")
-        captureSession.stopRunning()
-    }
-    
-    private func configureCaptureSassion() {
-        captureSession = AVCaptureSession()
-        captureSession.sessionPreset = .high
-        
-        guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
-            print("카메라를 사용할 수 없습니다.")
-            return
-        }
-        
         do {
-            let input = try AVCaptureDeviceInput(device: backCamera)
-            if captureSession.canAddInput(input) {
-                captureSession.addInput(input)
+            photoOutput = AVCapturePhotoOutput()
+            if captureSession.canAddOutput(photoOutput) {
+                captureSession.addOutput(photoOutput)
             } else {
-                print("입력을 추가할 수 없습니다.")
-                return
+                throw CameraError.cantAddPhotoOutput
             }
         } catch {
-            print("카메라 입력을 생성할 수 없습니다: \(error)")
-            return
+            print(error)
         }
     }
     
-    private func configurePreviewLayer() {
-        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.videoGravity = .resizeAspectFill
-    }
-    
-    private func configurePhotoOutput() {
-        photoOutput = AVCapturePhotoOutput()
-        if captureSession.canAddOutput(photoOutput) {
-            captureSession.addOutput(photoOutput)
-        } else {
-            print("출력을 추가할 수 없습니다.")
-            return
-        }
-    }
-    
-    func showCameraScreen()  {
-        DispatchQueue.global().async { [weak self] in
-            self?.captureSession.startRunning()
+    private func configureVideoOutput() {
+        do {
+            let output = AVCaptureVideoDataOutput()
+            output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "1e"))
+            
+            if captureSession.canAddOutput(output) {
+                captureSession.addOutput(output)
+            } else {
+                throw CameraError.cantAddVideoOutput
+            }
+        } catch {
+            print(error)
         }
     }
 }
 
-extension Camera: AVCapturePhotoCaptureDelegate {
+//MARK: - AVCapturePhotoCaptureDelegate
+extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
+    
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard let imageData = photo.fileDataRepresentation() else { return }
-        let originalImage = UIImage(data: imageData)
-        
-        ScanServiceProvider.shared.getImage(image: originalImage!)
+        do {
+            guard let imageData = photo.fileDataRepresentation() else { return }
+            let originalImage = UIImage(data: imageData)
+            
+            try scanServiceProvider.getImage(image: originalImage!)
+            mainView.updateThumbnail(image: originalImage!, imagesCount:  ScanServiceProvider.shared.imagesCount())
+            
+        } catch {
+            print(error)
+        }
     }
     
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        guard let pixelBuffer: CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        let image = UIImage(ciImage: ciImage)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.drawRect(image: image)
+            self?.viewWillLayoutSubviews()
+        }
+    }
 }
+

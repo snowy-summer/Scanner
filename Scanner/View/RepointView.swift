@@ -23,6 +23,7 @@ final class RepointView: UIView {
 
 //MARK: - configuration
 extension RepointView {
+    
     private func configureImageView() {
         self.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false

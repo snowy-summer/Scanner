@@ -15,16 +15,6 @@ final class ScanServiceProvider {
     private var originalImages: [UIImage] = []
     private var scannedImages: [UIImage] = []
     
-    func getImage(image: UIImage) {
-        originalImages.append(image)
-        
-        guard let scannedImage = detectRectangleAndCorrectPerspective(image: image) else {
-            print("스캔 실패")
-            return
-        }
-        
-        scannedImages.append(scannedImage)
-    }
     
     //MARK: - Test용 데이터 메소드
     func imagesCount() -> Int {
@@ -44,73 +34,92 @@ final class ScanServiceProvider {
         originalImages.removeAll()
         scannedImages.removeAll()
     }
+}
+
+//MARK: - image 얻기
+extension ScanServiceProvider {
     
-    func drawRectangle(view: UIView, image: UIImage) {
-        let sublayer = CAShapeLayer()
+    func getImage(image: UIImage) throws {
+        originalImages.append(image)
         
-        guard let ciImage = CIImage(image: image) else { return }
+        let monoImage = try convertToMono(image: image)
+    
+        let scannedImage = try detectRectangleAndCorrectPerspective(image: monoImage)
+        //TODO: 원래 색상으로 보여줘야 한다.
         
-        guard let rectangleFeature = rectangleDetector.detecteRectangle(ciImage: ciImage) else { return }
-        
-        let bezierPath = UIBezierPath()
-        
-        bezierPath.addArc(withCenter: rectangleFeature.topLeft,
-                          radius: 20,
-                          startAngle: 0,
-                          endAngle: CGFloat.pi * 2,
-                          clockwise: true)
-        bezierPath.addLine(to: rectangleFeature.topRight)
-        
-        bezierPath.addArc(withCenter: rectangleFeature.topRight,
-                          radius: 20,
-                          startAngle: 0,
-                          endAngle: CGFloat.pi * 2,
-                          clockwise: true)
-        bezierPath.addLine(to: rectangleFeature.bottomRight)
-        
-        bezierPath.addArc(withCenter: rectangleFeature.bottomRight,
-                          radius: 20,
-                          startAngle: 0,
-                          endAngle: CGFloat.pi * 2,
-                          clockwise: true)
-        bezierPath.addLine(to: rectangleFeature.bottomLeft)
-        
-        bezierPath.addArc(withCenter: rectangleFeature.bottomLeft,
-                          radius: 20,
-                          startAngle: 0,
-                          endAngle: CGFloat.pi * 2,
-                          clockwise: true)
-        bezierPath.addLine(to: rectangleFeature.topLeft)
-        bezierPath.lineWidth = 4
-        
-        sublayer.path = bezierPath.cgPath
-        sublayer.fillColor = UIColor.red.cgColor
-        view.layer.addSublayer(sublayer)
+        scannedImages.append(scannedImage)
     }
     
-    func detectRectangleAndCorrectPerspective(image: UIImage) -> UIImage? {
-        guard let ciImage = CIImage(image: image) else { return nil }
+    private func convertToMono(image: UIImage) throws -> CGImage {
+        guard let ciImage = CIImage(image: image) else {
+            throw ScannerError.convertToCIImageError
+        }
         
-        guard let rectangleFeature = rectangleDetector.detecteRectangle(ciImage: ciImage) else { return nil}
+        guard let outputImage =  rectangleDetector.convertToMono(ciImage: ciImage) else { throw DetectorError.failToConvertMonoImage }
         
-        guard let outputImage =  rectangleDetector.getPrepectiveImage(ciImage: ciImage, feature: rectangleFeature) else { return nil }
         let context = CIContext(options: nil)
-        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
+        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
+      
+        return cgImage
+    }
+    
+    private func detectRectangleAndCorrectPerspective(image: CGImage) throws -> UIImage {
+        let ciImage = CIImage(cgImage: image)
         
+        let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
+        let outputImage = try rectangleDetector.getPrepectiveImage(ciImage: ciImage, feature: rectangleFeature)
+        let context = CIContext(options: nil)
+        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
+    
         return UIImage(cgImage: cgImage).rotate(degrees: 90)
     }
     
-    func getDetectedRectanglePoint(image: UIImage) -> [CGPoint]? {
-        guard let ciImage = CIImage(image: image) else { return nil}
+}
+
+//MARK: - 좌표값 얻기
+extension ScanServiceProvider {
+    
+    func getDetectedRectanglePoint(image: UIImage, viewSize: CGSize) throws -> [CGPoint] {
+        let ciImage = image.ciImage!
         
-        guard let rectangleFeature = rectangleDetector.detecteRectangle(ciImage: ciImage) else { return nil}
+        let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
+        
+        let origin = CGPoint(x: image.size.width / 2,
+                             y: image.size.height / 2)
+      
+        let pointArray = [
+                           rectangleFeature.topLeft,
+                           rectangleFeature.topRight,
+                           rectangleFeature.bottomRight,
+                           rectangleFeature.bottomLeft,
+                         ]
+        
+         let rotatedPoints =  rotatePoints(points: pointArray, byAngle: CGFloat.pi * 3 / 2, aroundOrigin: origin)
+        
+       
+        
+        return fitToUikitCoordinate(image: image, viewSize: viewSize, of: rotatedPoints)
+    }
+    
+    private func fitToUikitCoordinate(image: UIImage, viewSize: CGSize, of rectanglePoints: [CGPoint]) -> [CGPoint] {
+        
+        let imageSize = image.size
+        let scaleX = viewSize.width / imageSize.width
+        let scaleY = viewSize.height / imageSize.height
         
         var pointArray = [CGPoint]()
-        pointArray.append(rectangleFeature.topLeft)
-        pointArray.append(rectangleFeature.topRight)
-        pointArray.append(rectangleFeature.bottomLeft)
-        pointArray.append(rectangleFeature.bottomRight)
-        
+        pointArray = rectanglePoints.map { CGPoint(x: $0.x * scaleX,
+                                        y: viewSize.height - ($0.y * scaleY)) }
         return pointArray
+    }
+
+    private func rotatePoints(points: [CGPoint], byAngle angle: CGFloat, aroundOrigin origin: CGPoint) -> [CGPoint] {
+        return points.map { point in
+            let translatedPoint = CGPoint(x: point.x - origin.x, y: point.y - origin.y)
+            let rotatedPoint = CGPoint(x: cos(angle) * translatedPoint.x - sin(angle) * translatedPoint.y,
+                                       y: sin(angle) * translatedPoint.x + cos(angle) * translatedPoint.y)
+            
+            return CGPoint(x: rotatedPoint.x + origin.x, y: rotatedPoint.y + origin.y)
+        }
     }
 }

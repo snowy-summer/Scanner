@@ -9,7 +9,8 @@
 /* Begin PBXBuildFile section */
 		6B10A5042B6BB92600E03E18 /* RepointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10A5032B6BB92600E03E18 /* RepointView.swift */; };
 		6B10A5062B6BBC5C00E03E18 /* RepointViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10A5052B6BBC5C00E03E18 /* RepointViewController.swift */; };
-		6B10A5082B6BC71400E03E18 /* PreviewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B10A5072B6BC71400E03E18 /* PreviewDelegate.swift */; };
+		6B373DED2B6E29A000EDC080 /* CameraError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B373DEC2B6E29A000EDC080 /* CameraError.swift */; };
+		6B3F536A2B6F79540070DDC2 /* DetectorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3F53692B6F79540070DDC2 /* DetectorError.swift */; };
 		6B4E5EE72B6C78A200229F1D /* UIImage++Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EE62B6C78A200229F1D /* UIImage++Extension.swift */; };
 		6B4E5EEA2B6C8B4B00229F1D /* ScannerError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EE92B6C8B4B00229F1D /* ScannerError.swift */; };
 		6B4E5EEE2B6CCB0200229F1D /* CIFilterKeyName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */; };
@@ -29,7 +30,8 @@
 /* Begin PBXFileReference section */
 		6B10A5032B6BB92600E03E18 /* RepointView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepointView.swift; sourceTree = "<group>"; };
 		6B10A5052B6BBC5C00E03E18 /* RepointViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepointViewController.swift; sourceTree = "<group>"; };
-		6B10A5072B6BC71400E03E18 /* PreviewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewDelegate.swift; sourceTree = "<group>"; };
+		6B373DEC2B6E29A000EDC080 /* CameraError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraError.swift; sourceTree = "<group>"; };
+		6B3F53692B6F79540070DDC2 /* DetectorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectorError.swift; sourceTree = "<group>"; };
 		6B4E5EE62B6C78A200229F1D /* UIImage++Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage++Extension.swift"; sourceTree = "<group>"; };
 		6B4E5EE92B6C8B4B00229F1D /* ScannerError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerError.swift; sourceTree = "<group>"; };
 		6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIFilterKeyName.swift; sourceTree = "<group>"; };
@@ -71,6 +73,8 @@
 			isa = PBXGroup;
 			children = (
 				6B4E5EE92B6C8B4B00229F1D /* ScannerError.swift */,
+				6B3F53692B6F79540070DDC2 /* DetectorError.swift */,
+				6B373DEC2B6E29A000EDC080 /* CameraError.swift */,
 			);
 			path = Error;
 			sourceTree = "<group>";
@@ -127,7 +131,6 @@
 			isa = PBXGroup;
 			children = (
 				6BC24CAC2B6BA5300078EAB9 /* MainViewDelegate.swift */,
-				6B10A5072B6BC71400E03E18 /* PreviewDelegate.swift */,
 			);
 			path = Delegate;
 			sourceTree = "<group>";
@@ -244,11 +247,12 @@
 				6BC24CAD2B6BA5300078EAB9 /* MainViewDelegate.swift in Sources */,
 				6BEE74D12B6A2B49009F36D2 /* MainView.swift in Sources */,
 				6B10A5042B6BB92600E03E18 /* RepointView.swift in Sources */,
-				6B10A5082B6BC71400E03E18 /* PreviewDelegate.swift in Sources */,
 				6BC24CB12B6BAE190078EAB9 /* ScanServiceProvider.swift in Sources */,
 				6BEE74BD2B6A13FD009F36D2 /* AppDelegate.swift in Sources */,
 				6BC24CA92B6B3B020078EAB9 /* Preview.swift in Sources */,
 				6BEE74BF2B6A13FD009F36D2 /* SceneDelegate.swift in Sources */,
+				6B373DED2B6E29A000EDC080 /* CameraError.swift in Sources */,
+				6B3F536A2B6F79540070DDC2 /* DetectorError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

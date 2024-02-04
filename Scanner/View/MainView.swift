@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import AVFoundation
 
 final class MainView: UIView {
     private let cameraView = UIView()
@@ -47,7 +46,6 @@ extension MainView {
             cameraView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             cameraView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             cameraView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 0.75)
-//            cameraView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(cameraViewConstraint)
@@ -148,6 +146,7 @@ extension MainView {
 }
 
 extension MainView {
+    
     func addCameraViewLayer(subLayer: CALayer) {
         cameraView.layer.addSublayer(subLayer)
     }

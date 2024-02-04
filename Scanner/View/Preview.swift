@@ -18,7 +18,6 @@ final class Preview: UIView {
     required init?(coder: NSCoder) {
         fatalError("Preview 생성오류")
     }
-    
 }
 
 extension Preview {

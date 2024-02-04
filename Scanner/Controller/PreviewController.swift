@@ -15,28 +15,19 @@ final class PreviewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.isToolbarHidden = false
+        navigationController?.navigationBar.isHidden = false
     }
     
     override func viewDidLoad() {
         view.backgroundColor = .gray
         preview.updateImageView(image: ScanServiceProvider.shared.readScannedImage())
-        navigationController?.isToolbarHidden = false
         setupToolBarButton()
     }
-    
-    
-    @objc func saveAction() {
+}
 
-    }
-    
-    @objc func cropAction() {
-        navigationController?.pushViewController(RepointViewController(), animated: true)
-    }
-    
-    @objc func deleteAction() {
+//MARK: - configuration
 
-    }
-    
+extension PreviewController {
     func setupToolBarButton() {
 
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
@@ -63,5 +54,21 @@ final class PreviewController: UIViewController {
                          cropButton, flexibleSpace ]
 
         toolbarItems = barItems
+    }
+}
+
+//MARK: - objc Action method
+
+extension PreviewController {
+    @objc func saveAction() {
+
+    }
+    
+    @objc func cropAction() {
+        navigationController?.pushViewController(RepointViewController(), animated: true)
+    }
+    
+    @objc func deleteAction() {
+
     }
 }

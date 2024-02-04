@@ -21,14 +21,23 @@ final class RectangleDetector {
         return detector!
     }()
     
-    func detecteRectangle(ciImage: CIImage) -> CIRectangleFeature? {
+    func detecteRectangle(ciImage: CIImage) throws -> CIRectangleFeature {
         let features = detector.features(in: ciImage)
-        let rectangleFeature = features.first as? CIRectangleFeature
+        guard let rectangleFeature = features.first as? CIRectangleFeature else { throw DetectorError.failToDetectRectangle }
         
         return rectangleFeature
     }
     
-    func getPrepectiveImage(ciImage: CIImage, feature: CIRectangleFeature) -> CIImage? {
+    
+    func convertToMono(ciImage: CIImage) -> CIImage? {
+        let monofilter = CIFilter(name: CIFilterKeyName.mono.rawValue)
+        monofilter?.setValue(ciImage, forKey: kCIInputImageKey)
+        
+        let outputImage = monofilter?.outputImage
+        return outputImage
+    }
+    
+    func getPrepectiveImage(ciImage: CIImage, feature: CIRectangleFeature) throws -> CIImage {
         let perspectiveCorrection = CIFilter(name: CIFilterKeyName.PerspectiveCorrection.rawValue)
         perspectiveCorrection?.setValue(CIVector(cgPoint: feature.topLeft), forKey: "inputTopLeft")
         perspectiveCorrection?.setValue(CIVector(cgPoint: feature.topRight), forKey: "inputTopRight")
@@ -36,7 +45,7 @@ final class RectangleDetector {
         perspectiveCorrection?.setValue(CIVector(cgPoint: feature.bottomLeft), forKey: "inputBottomLeft")
         perspectiveCorrection?.setValue(ciImage, forKey: kCIInputImageKey)
         
-        let outputImage = perspectiveCorrection?.outputImage
+        guard let outputImage = perspectiveCorrection?.outputImage else { throw DetectorError.failToGetPerspectiveCorrectionImage }
         
         return outputImage
     }
