@@ -6,14 +6,27 @@
 //
 
 import UIKit
+import AVFoundation
+
+protocol MainViewDelegate: AnyObject {
+    func pushSaveButton()
+    func getCountOfImages() -> Int
+    func appendOriginalImage(image: UIImage)
+}
 
 final class MainView: UIView {
-    private let cameraView = UIView()
+    private(set) var cameraView = UIView()
     private let thumbnailView = UIImageView()
     private let captureButton = UIButton()
     private let saveButton = UIButton()
     private let imageCountView = UIView()
     private let imageCountLabel = UILabel()
+    
+    private let captureSession = AVCaptureSession()
+    private var previewLayer = AVCaptureVideoPreviewLayer()
+    private let photoOutput = AVCapturePhotoOutput()
+    private let videoOutput = AVCaptureVideoDataOutput()
+    private let alphaLayer = CAShapeLayer()
     
     weak var delegate: MainViewDelegate?
     
@@ -26,6 +39,11 @@ final class MainView: UIView {
         configureThumbnailView()
         configureImageCountView()
         configureImageCountLabel()
+        
+        configureCaptureSassion()
+        configurePreviewLayer()
+        configurePhotoOutput()
+        configureVideoOutput()
     }
     
     required init?(coder: NSCoder) {
@@ -35,6 +53,14 @@ final class MainView: UIView {
 
 //MARK: - configuration
 extension MainView {
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        previewLayer.frame = cameraView.bounds
+        alphaLayer.removeFromSuperlayer()
+        previewLayer.addSublayer(alphaLayer)
+    }
+    
     private func configureCameraView() {
         self.addSubview(cameraView)
         cameraView.translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +80,7 @@ extension MainView {
     private func configureCaptureButton() {
         let buttonSymbol = UIImage.SymbolConfiguration(pointSize: 60, weight: .regular)
         captureButton.setImage(UIImage(systemName: "camera.aperture", withConfiguration: buttonSymbol), for: .normal)
-        captureButton.addTarget(self, action: #selector(pushCaptureButton), for: .touchUpInside)
+        captureButton.addTarget(self, action: #selector(capture), for: .touchUpInside)
         captureButton.tintColor = .white
         
         self.addSubview(captureButton)
@@ -151,10 +177,6 @@ extension MainView {
         cameraView.layer.addSublayer(subLayer)
     }
     
-    func cameraViewBounds() -> CGRect{
-        return cameraView.bounds
-    }
-    
     func updateThumbnail(image: UIImage, imagesCount: Int) {
         thumbnailView.image = image
         
@@ -170,11 +192,97 @@ extension MainView {
 
 //MARK: - objc Button Action
 extension MainView {
-    @objc private func pushCaptureButton() {
-        delegate?.pushCaptureButton()
-    }
+    
+    @objc private func capture() {
+         guard let delegate = delegate,
+               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
+         let settings = AVCapturePhotoSettings()
+         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
+     }
     
     @objc private func pushSaveButton() {
         delegate?.pushSaveButton()
     }
+}
+
+extension MainView {
+
+    func drawRect(cgPoints: [CGPoint]) {
+        let outLine = UIBezierPath()
+        outLine.move(to: cgPoints[0])
+        outLine.addLine(to: cgPoints[1])
+        outLine.addLine(to: cgPoints[2])
+        outLine.addLine(to: cgPoints[3])
+        outLine.addLine(to: cgPoints[0])
+        
+        alphaLayer.path = outLine.cgPath
+        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
+        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
+        alphaLayer.lineWidth = 4
+    }
+    
+    private func configureCaptureSassion() {
+        do {
+            
+            captureSession.sessionPreset = .high
+            
+            guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera,
+                                                           for: .video,
+                                                           position: .back) else {
+                throw CameraError.cantAddBackCamera
+            }
+            
+            let input = try AVCaptureDeviceInput(device: backCamera)
+            if captureSession.canAddInput(input) {
+                captureSession.addInput(input)
+            } else {
+                throw CameraError.cantAddDeviceInput
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    private func configurePreviewLayer() {
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        previewLayer.videoGravity = .resizeAspectFill
+        cameraView.layer.addSublayer(previewLayer)
+    }
+    
+    private func configurePhotoOutput() {
+        do {
+            if captureSession.canAddOutput(photoOutput) {
+                captureSession.addOutput(photoOutput)
+            } else {
+                throw CameraError.cantAddPhotoOutput
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    func configureVideoOutput() {
+        do {
+            guard let delegate = delegate, let videoDataOutputDelegate = delegate as? AVCaptureVideoDataOutputSampleBufferDelegate else { return }
+            
+            videoOutput.setSampleBufferDelegate(videoDataOutputDelegate, queue: DispatchQueue(label: "VideoQueue"))
+            
+            if captureSession.canAddOutput(videoOutput) {
+                captureSession.addOutput(videoOutput)
+            } else {
+                throw CameraError.cantAddVideoOutput
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    func captureStartRunning() {
+        captureSession.startRunning()
+    }
+    
+    func captureStopRunning() {
+        captureSession.stopRunning()
+    }
+
 }

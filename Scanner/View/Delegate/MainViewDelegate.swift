@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol MainViewDelegate: AnyObject {
-    func pushSaveButton()
-    func pushCaptureButton()
-}
+//protocol MainViewDelegate: AnyObject {
+//    func pushSaveButton()
+//    func pushCaptureButton()
+//}

@@ -41,19 +41,13 @@ extension ScanServiceProvider {
     
     func getImage(image: UIImage) throws {
         originalImages.append(image)
-        
-        let monoImage = try convertToMono(image: image)
     
-        let scannedImage = try detectRectangleAndCorrectPerspective(image: monoImage)
-        //TODO: 원래 색상으로 보여줘야 한다.
-        
+        let scannedImage = try detectRectangleAndCorrectPerspective(image: image)
         scannedImages.append(scannedImage)
     }
     
     private func convertToMono(image: UIImage) throws -> CGImage {
-        guard let ciImage = CIImage(image: image) else {
-            throw ScannerError.convertToCIImageError
-        }
+        guard let ciImage = CIImage(image: image) else { throw ScannerError.convertToCIImageError }
         
         guard let outputImage =  rectangleDetector.convertToMono(ciImage: ciImage) else { throw DetectorError.failToConvertMonoImage }
         
@@ -63,8 +57,8 @@ extension ScanServiceProvider {
         return cgImage
     }
     
-    private func detectRectangleAndCorrectPerspective(image: CGImage) throws -> UIImage {
-        let ciImage = CIImage(cgImage: image)
+    private func detectRectangleAndCorrectPerspective(image: UIImage) throws -> UIImage {
+        guard let ciImage = CIImage(image: image) else { throw ScannerError.convertToCIImageError }
         
         let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
         let outputImage = try rectangleDetector.getPrepectiveImage(ciImage: ciImage, feature: rectangleFeature)
@@ -109,17 +103,19 @@ extension ScanServiceProvider {
         
         var pointArray = [CGPoint]()
         pointArray = rectanglePoints.map { CGPoint(x: $0.x * scaleX,
-                                        y: viewSize.height - ($0.y * scaleY)) }
+                                                   y: viewSize.height - ($0.y * scaleY)) }
         return pointArray
     }
 
     private func rotatePoints(points: [CGPoint], byAngle angle: CGFloat, aroundOrigin origin: CGPoint) -> [CGPoint] {
         return points.map { point in
-            let translatedPoint = CGPoint(x: point.x - origin.x, y: point.y - origin.y)
+            let translatedPoint = CGPoint(x: point.x - origin.x,
+                                          y: point.y - origin.y)
             let rotatedPoint = CGPoint(x: cos(angle) * translatedPoint.x - sin(angle) * translatedPoint.y,
                                        y: sin(angle) * translatedPoint.x + cos(angle) * translatedPoint.y)
             
-            return CGPoint(x: rotatedPoint.x + origin.x, y: rotatedPoint.y + origin.y)
+            return CGPoint(x: rotatedPoint.x + origin.x,
+                           y: rotatedPoint.y + origin.y)
         }
     }
 }

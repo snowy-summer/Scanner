@@ -7,9 +7,10 @@
 
 import UIKit
 
-
 final class RepointViewController: UIViewController {
     private let repointView = RepointView()
+    private let alphaLayer = CAShapeLayer()
+    private let scanServiceProvider = ScanServiceProvider.shared
     
     override func loadView() {
         view = repointView
@@ -18,9 +19,11 @@ final class RepointViewController: UIViewController {
     override func viewDidLoad() {
         view.backgroundColor = .gray
         navigationController?.navigationBar.isHidden = true
-        let image = ScanServiceProvider.shared.readOriginalImage()
+        let image = scanServiceProvider.readOriginalImage()
+        repointView.layer.addSublayer(alphaLayer)
         repointView.updateUI(image: image)
         setupToolBarButton()
+        drawRect(image: image)
     }
 }
 
@@ -66,5 +69,33 @@ extension RepointViewController {
     
     @objc func undoAction() {
         navigationController?.popViewController(animated: true)
+    }
+}
+
+extension RepointViewController {
+    func drawRect(image: UIImage) {
+        do {
+            let viewSize = view.bounds.size
+            let points = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
+           
+            drawRect(cgPoints: points)
+            
+        } catch {
+            print(error)
+        }
+    }
+
+    private func drawRect(cgPoints: [CGPoint]) {
+        let outLine = UIBezierPath()
+        outLine.move(to: cgPoints[0])
+        outLine.addLine(to: cgPoints[1])
+        outLine.addLine(to: cgPoints[2])
+        outLine.addLine(to: cgPoints[3])
+        outLine.addLine(to: cgPoints[0])
+        
+        alphaLayer.path = outLine.cgPath
+        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
+        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
+        alphaLayer.lineWidth = 4
     }
 }
