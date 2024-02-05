@@ -9,8 +9,16 @@ import UIKit
 
 final class RepointViewController: UIViewController {
     private let repointView = RepointView()
-    private let alphaLayer = CAShapeLayer()
-    private let scanServiceProvider = ScanServiceProvider.shared
+    private let scanServiceProvider: ScanServiceProvider
+    
+    init(scanServiceProvider: ScanServiceProvider) {
+        self.scanServiceProvider = scanServiceProvider
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("RepointViewController 생성오류")
+    }
     
     override func loadView() {
         view = repointView
@@ -19,11 +27,14 @@ final class RepointViewController: UIViewController {
     override func viewDidLoad() {
         view.backgroundColor = .gray
         navigationController?.navigationBar.isHidden = true
-        let image = scanServiceProvider.readOriginalImage()
-        repointView.layer.addSublayer(alphaLayer)
+        guard let image = scanServiceProvider.originalImages.last else {
+            //촬영한 이미지가 없다고 알려야 할듯
+            return
+        }
+        
         repointView.updateUI(image: image)
         setupToolBarButton()
-        drawRect(image: image)
+        drawRectOnRepointView(image: image)
     }
 }
 
@@ -73,29 +84,16 @@ extension RepointViewController {
 }
 
 extension RepointViewController {
-    func drawRect(image: UIImage) {
+    func drawRectOnRepointView(image: UIImage) {
         do {
-            let viewSize = view.bounds.size
+            let viewSize = repointView.imageView.bounds.size
+            
             let points = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
-           
-            drawRect(cgPoints: points)
+            
+            repointView.drawRect(cgPoints: points)
             
         } catch {
             print(error)
         }
-    }
-
-    private func drawRect(cgPoints: [CGPoint]) {
-        let outLine = UIBezierPath()
-        outLine.move(to: cgPoints[0])
-        outLine.addLine(to: cgPoints[1])
-        outLine.addLine(to: cgPoints[2])
-        outLine.addLine(to: cgPoints[3])
-        outLine.addLine(to: cgPoints[0])
-        
-        alphaLayer.path = outLine.cgPath
-        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
-        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
-        alphaLayer.lineWidth = 4
     }
 }

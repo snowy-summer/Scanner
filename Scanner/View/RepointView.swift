@@ -9,7 +9,8 @@ import UIKit
 
 final class RepointView: UIView {
     
-    private let imageView = UIImageView()
+    private (set) var imageView = UIImageView()
+    private let alphaLayer = CAShapeLayer()
     
     init() {
         super.init(frame: .zero)
@@ -43,9 +44,23 @@ extension RepointView {
 
 
 extension RepointView {
+    
     func updateUI(image: UIImage) {
         imageView.image = image
     }
-
+    
+    func drawRect(cgPoints: [CGPoint]) {
+        let outLine = UIBezierPath()
+        outLine.move(to: cgPoints[0])
+        outLine.addLine(to: cgPoints[1])
+        outLine.addLine(to: cgPoints[2])
+        outLine.addLine(to: cgPoints[3])
+        outLine.addLine(to: cgPoints[0])
+        
+        alphaLayer.path = outLine.cgPath
+        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
+        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
+        alphaLayer.lineWidth = 4
+    }
 }
 

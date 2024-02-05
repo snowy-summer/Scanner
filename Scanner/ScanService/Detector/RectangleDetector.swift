@@ -14,11 +14,13 @@ final class RectangleDetector {
             CIDetectorMinFeatureSize: NSNumber(floatLiteral: 0.2)
         ]
         
-        let detector = CIDetector(ofType: CIDetectorTypeRectangle,
+       guard let detector = CIDetector(ofType: CIDetectorTypeRectangle,
                                         context: nil,
-                                        options: options)
+                                       options: options) else {
+           return CIDetector()
+       }
     
-        return detector!
+        return detector
     }()
     
     func detecteRectangle(ciImage: CIImage) throws -> CIRectangleFeature {

@@ -11,7 +11,7 @@ import AVFoundation
 final class MainViewController: UIViewController {
     private var mainView = MainView()
     
-    private let scanServiceProvider = ScanServiceProvider.shared
+    private let scanServiceProvider = ScanServiceProvider()
     private var beforePoints = [CGPoint]()
     private var afterPoints = [CGPoint]()
     
@@ -48,7 +48,7 @@ final class MainViewController: UIViewController {
     }
     
     @objc private func cancelAction() {
-        ScanServiceProvider.shared.clearImages()
+        scanServiceProvider.clearImages()
         mainView.updateThumbnail(image: UIImage(), imagesCount: 0)
     }
     
@@ -81,7 +81,7 @@ final class MainViewController: UIViewController {
 extension MainViewController: MainViewDelegate {
     
     func pushSaveButton() {
-        navigationController?.pushViewController(PreviewController(), animated: true)
+        navigationController?.pushViewController(PreviewController(scanServiceProvider: scanServiceProvider), animated: true)
     }
     
     func getCountOfImages() -> Int {
@@ -105,7 +105,7 @@ extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataO
         guard let originalImage = UIImage(data: imageData) else { return }
         
         appendOriginalImage(image: originalImage)
-        mainView.updateThumbnail(image: originalImage, imagesCount: scanServiceProvider.imagesCount())
+        mainView.updateThumbnail(image: originalImage, imagesCount: scanServiceProvider.originalImages.count)
         
     }
     

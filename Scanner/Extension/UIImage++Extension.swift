@@ -14,19 +14,20 @@ extension UIImage {
         let affineTransform: CGAffineTransform = CGAffineTransform(rotationAngle: degrees * CGFloat.pi / 180)
         rotatedViewBox.transform = affineTransform
         
-        let rotatedSize: CGSize = rotatedViewBox.frame.size
+        let rotatedSize = rotatedViewBox.frame.size
         
         UIGraphicsBeginImageContext(rotatedSize)
-        let bitmap: CGContext = UIGraphicsGetCurrentContext()!
+        guard let bitmap = UIGraphicsGetCurrentContext() else { return UIImage() }
 
         bitmap.translateBy(x: rotatedSize.width / 2, y: rotatedSize.height / 2)
 
         bitmap.rotate(by: (degrees * CGFloat.pi / 180))
-
-        bitmap.scaleBy(x: 1.0, y: -1.0)
-        bitmap.draw(cgImage!, in: CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height))
         
-        let newImage: UIImage = UIGraphicsGetImageFromCurrentImageContext()!
+        bitmap.scaleBy(x: 1.0, y: -1.0)
+        guard let cgImage = cgImage else { return UIImage() }
+        bitmap.draw(cgImage, in: CGRect(x: -size.width / 2, y: -size.height / 2, width: size.width, height: size.height))
+        
+        guard let newImage = UIGraphicsGetImageFromCurrentImageContext() else { return UIImage()}
         UIGraphicsEndImageContext()
         
         return newImage

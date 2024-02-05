@@ -148,11 +148,12 @@ extension MainView {
         
         NSLayoutConstraint.activate(imageCountViewConstraint)
         DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             NSLayoutConstraint.activate([
-                self!.imageCountView.leadingAnchor.constraint(equalTo: self!.thumbnailView.trailingAnchor, constant: -(self!.imageCountView.bounds.width / 2)),
-                self!.imageCountView.topAnchor.constraint(equalTo: self!.thumbnailView.topAnchor, constant: -(self!.imageCountView.bounds.width / 2))
+                imageCountView.leadingAnchor.constraint(equalTo: thumbnailView.trailingAnchor, constant: -(imageCountView.bounds.width / 2)),
+                imageCountView.topAnchor.constraint(equalTo: thumbnailView.topAnchor, constant: -(imageCountView.bounds.width / 2))
             ])
-            self!.imageCountView.layer.cornerRadius = self!.imageCountView.bounds.width / 2
+            imageCountView.layer.cornerRadius = imageCountView.bounds.width / 2
         }
         
         imageCountView.isHidden = true

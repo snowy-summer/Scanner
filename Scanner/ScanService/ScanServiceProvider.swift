@@ -8,26 +8,16 @@
 import UIKit
 
 final class ScanServiceProvider {
-    
-    static let shared = ScanServiceProvider()
-    
+      
     private let rectangleDetector = RectangleDetector()
-    private var originalImages: [UIImage] = []
-    private var scannedImages: [UIImage] = []
-    
+    private(set) var originalImages: [UIImage] = []
+    private(set) var scannedImages: [UIImage] = []
     
     //MARK: - Test용 데이터 메소드
-    func imagesCount() -> Int {
-      return originalImages.count
-    }
     
     func readScannedImage() -> UIImage {
         guard let image = scannedImages.last else { return UIImage() }
         return image
-    }
-    
-    func readOriginalImage() -> UIImage {
-        return originalImages.last!
     }
     
     func clearImages() {
@@ -74,7 +64,7 @@ extension ScanServiceProvider {
 extension ScanServiceProvider {
     
     func getDetectedRectanglePoint(image: UIImage, viewSize: CGSize) throws -> [CGPoint] {
-        let ciImage = image.ciImage!
+        guard let ciImage = image.ciImage else { throw ScannerError.convertToCIImageError}
         
         let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
         

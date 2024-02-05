@@ -7,7 +7,17 @@
 import UIKit
 
 final class PreviewController: UIViewController {
-    let preview = Preview()
+    private let preview = Preview()
+    private let scanServiceProvider: ScanServiceProvider
+    
+    init(scanServiceProvider: ScanServiceProvider) {
+        self.scanServiceProvider = scanServiceProvider
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("PreviewController 생성오류")
+    }
     
     override func loadView() {
         view = preview
@@ -20,7 +30,9 @@ final class PreviewController: UIViewController {
     
     override func viewDidLoad() {
         view.backgroundColor = .gray
-        preview.updateImageView(image: ScanServiceProvider.shared.readScannedImage())
+        preview.updateImageView(image: scanServiceProvider.readScannedImage())
+        preview.updatePageControlPage(numberOfPage: scanServiceProvider.scannedImages.count)
+        preview.images = scanServiceProvider.scannedImages
         setupToolBarButton()
     }
 }
@@ -65,10 +77,16 @@ extension PreviewController {
     }
     
     @objc func cropAction() {
-        navigationController?.pushViewController(RepointViewController(), animated: true)
+        navigationController?.pushViewController(RepointViewController(scanServiceProvider: scanServiceProvider), animated: true)
     }
     
     @objc func deleteAction() {
 
     }
+    
+    func udateImage() {
+        preview.updateImageView(image: scanServiceProvider.readScannedImage())
+    }
 }
+
+
