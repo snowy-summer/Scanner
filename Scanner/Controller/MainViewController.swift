@@ -84,10 +84,6 @@ extension MainViewController: MainViewDelegate {
         navigationController?.pushViewController(PreviewController(scanServiceProvider: scanServiceProvider), animated: true)
     }
     
-    func getCountOfImages() -> Int {
-        return scanServiceProvider.imagesCount()
-    }
-    
     func appendOriginalImage(image: UIImage) {
         do{
             try scanServiceProvider.getImage(image: image)
@@ -100,7 +96,6 @@ extension MainViewController: MainViewDelegate {
 extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        
         guard let imageData = photo.fileDataRepresentation() else { return }
         guard let originalImage = UIImage(data: imageData) else { return }
         

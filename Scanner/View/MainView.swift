@@ -10,8 +10,6 @@ import AVFoundation
 
 protocol MainViewDelegate: AnyObject {
     func pushSaveButton()
-    func getCountOfImages() -> Int
-    func appendOriginalImage(image: UIImage)
 }
 
 final class MainView: UIView {
