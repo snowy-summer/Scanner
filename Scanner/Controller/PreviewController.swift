@@ -40,16 +40,16 @@ final class PreviewController: UIViewController {
 //MARK: - configuration
 
 extension PreviewController {
-    func setupToolBarButton() {
-
+    private func setupToolBarButton() {
+        
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
                                             target: nil,
                                             action: nil)
         
-        let finishButton = UIBarButtonItem(title: "반시계",
+        let rotateButton = UIBarButtonItem(title: "반시계",
                                            style: .plain,
                                            target: self,
-                                           action: #selector(saveAction))
+                                           action: #selector(rotateAction))
         
         let deleteButton = UIBarButtonItem(image: UIImage(systemName: "trash.fill"),
                                            style: .plain,
@@ -62,9 +62,9 @@ extension PreviewController {
                                          action: #selector(cropAction))
         
         let barItems = [ flexibleSpace, deleteButton,
-                         flexibleSpace, flexibleSpace, finishButton, flexibleSpace, flexibleSpace,
+                         flexibleSpace, flexibleSpace, rotateButton, flexibleSpace, flexibleSpace,
                          cropButton, flexibleSpace ]
-
+        
         toolbarItems = barItems
     }
 }
@@ -72,21 +72,17 @@ extension PreviewController {
 //MARK: - objc Action method
 
 extension PreviewController {
-    @objc func saveAction() {
-
+    @objc private func rotateAction() {
     }
     
-    @objc func cropAction() {
+    @objc private func cropAction() {
         navigationController?.pushViewController(RepointViewController(scanServiceProvider: scanServiceProvider), animated: true)
     }
     
-    @objc func deleteAction() {
-
-    }
-    
-    func udateImage() {
-        preview.updateImageView(image: scanServiceProvider.readScannedImage())
+    @objc private func deleteAction() {
+        
     }
 }
+
 
 

@@ -41,7 +41,7 @@ final class RepointViewController: UIViewController {
 //MARK: - configuration
 
 extension RepointViewController {
-    func setupToolBarButton() {
+   private func setupToolBarButton() {
 
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
                                             target: nil,
@@ -74,17 +74,17 @@ extension RepointViewController {
 //MARK: - objc Action method
 
 extension RepointViewController {
-    @objc func doneAction() {
+    @objc private func doneAction() {
 
     }
     
-    @objc func undoAction() {
+    @objc private func undoAction() {
         navigationController?.popViewController(animated: true)
     }
 }
 
 extension RepointViewController {
-    func drawRectOnRepointView(image: UIImage) {
+    private func drawRectOnRepointView(image: UIImage) {
         do {
             let viewSize = repointView.imageView.bounds.size
             

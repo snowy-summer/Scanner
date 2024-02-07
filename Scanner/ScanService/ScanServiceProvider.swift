@@ -54,7 +54,6 @@ extension ScanServiceProvider {
         let outputImage = try rectangleDetector.getPrepectiveImage(ciImage: ciImage, feature: rectangleFeature)
         let context = CIContext(options: nil)
         guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
-        
         return UIImage(cgImage: cgImage).rotate(degrees: 90)
     }
     
@@ -78,10 +77,8 @@ extension ScanServiceProvider {
             rectangleFeature.bottomLeft,
         ]
         
-        
         let rotatedPoints =  rotatePoints(degrees: 270, points: pointArray, aroundOrigin: origin)
         let fitToUiKitCoordinates = fitToUikitCoordinate(image: image, viewSize: viewSize, of: rotatedPoints)
-        
         
         return fitToUiKitCoordinates
     }
@@ -93,7 +90,6 @@ extension ScanServiceProvider {
         let scaleX = imageSize.width / viewSize.width
         let scaleY = imageSize.height * scale / viewSize.height
         
-        let mx = viewSize.width / 2
         let my = viewSize.height / 2
         
         let ratioPoints =  rectanglePoints.map { CGPoint(x: $0.x / scaleX,

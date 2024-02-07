@@ -42,7 +42,7 @@ extension RepointView {
     }
 }
 
-
+//MARK: - UI Update
 extension RepointView {
     
     func updateUI(image: UIImage) {

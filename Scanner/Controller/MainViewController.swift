@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import Photos
 
 final class MainViewController: UIViewController {
     private var mainView = MainView()
@@ -24,14 +25,8 @@ final class MainViewController: UIViewController {
         view.backgroundColor = .gray
         mainView.delegate = self
         mainView.configureVideoOutput()
-        
-        let cancelButton = UIBarButtonItem(title: "취소",
-                                           style: .plain,
-                                           target: self,
-                                           action: #selector(cancelAction))
-        cancelButton.tintColor = .white
-        navigationItem.leftBarButtonItem = cancelButton
-        navigationController?.navigationBar.tintColor = .black
+        configureNavigationBar()
+        requestCameraAccess()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,13 +41,98 @@ final class MainViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         mainView.captureStopRunning()
     }
+}
+
+extension MainViewController {
+    
+    private func configureNavigationBar() {
+        let captureTypeButton = UIBarButtonItem(title: "자동/수동",
+                                                style: .plain,
+                                                target: self,
+                                                action: #selector(turnOnAutoTypeAction))
+        
+        let cancelButton = UIBarButtonItem(title: "취소",
+                                           style: .plain,
+                                           target: self,
+                                           action: #selector(cancelAction))
+        cancelButton.tintColor = .white
+        navigationItem.leftBarButtonItem = cancelButton
+        navigationItem.rightBarButtonItem = captureTypeButton
+        navigationController?.navigationBar.tintColor = .black
+    }
     
     @objc private func cancelAction() {
         scanServiceProvider.clearImages()
         mainView.updateThumbnail(image: UIImage(), imagesCount: 0)
     }
     
-    func drawRectOnCameraPreview(image: UIImage) {
+    @objc private func turnOnAutoTypeAction() {
+   
+    }
+    
+    private func requestCameraAccess() {
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (result) in
+            if !result {
+                DispatchQueue.main.async { [weak self] in
+                    self?.requestCameraAccessAlert()
+                }
+            }
+        })
+    }
+    
+    private func requestCameraAccessAlert() {
+        let cameraAlert = UIAlertController(title: "알림",
+                                            message: "카메라를 이용하기 위해서 카메라의 사용권한이 필요합니다.",
+                                            preferredStyle: .alert)
+        
+        let setting = UIAlertAction(title: "설정",
+                                    style: .default) { (UIAlertAction) in
+            guard let appSetting = URL(string: UIApplication.openSettingsURLString) else { return }
+            UIApplication.shared.open(appSetting)
+        }
+        
+        let confirm = UIAlertAction(title: "확인",
+                                   style: .default)
+        
+        cameraAlert.addAction(setting)
+        cameraAlert.addAction(confirm)
+        self.present(cameraAlert, animated: true, completion: nil)
+    }
+    
+    private func requestPhotoLibraryAcess() {
+
+        PHPhotoLibrary.shared().performChanges({
+               let request = PHAssetCreationRequest.forAsset()
+//            request.addResource(with: <#T##PHAssetResourceType#>, data: <#T##Data#>, options: <#T##PHAssetResourceCreationOptions?#>)
+
+               
+           }, completionHandler: { success, error in
+               if success {
+                   print("성공")
+               } else {
+                   print("실패")
+               }
+           })
+    }
+
+    private func requestPhotoLibraryAccessAlert() {
+        let cameraAlert = UIAlertController(title: "알림",
+                                            message: "사진을 저장하기 위해서 앨범의 사용권한이 필요합니다.",
+                                            preferredStyle: .alert)
+        
+        
+        let setting = UIAlertAction(title: "설정",
+                                    style: .default)
+        
+        let confirm = UIAlertAction(title: "확인",
+                                    style: .default)
+        
+        cameraAlert.addAction(setting)
+        cameraAlert.addAction(confirm)
+        self.present(cameraAlert, animated: true, completion: nil)
+    }
+    
+    private func drawRectOnCameraPreview(image: UIImage) {
         do {
             let viewSize = mainView.cameraView.bounds.size
             afterPoints = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
@@ -75,16 +155,8 @@ final class MainViewController: UIViewController {
             print(error)
         }
     }
-}
-
-//MARK: - MainViewDelegate
-extension MainViewController: MainViewDelegate {
     
-    func pushSaveButton() {
-        navigationController?.pushViewController(PreviewController(scanServiceProvider: scanServiceProvider), animated: true)
-    }
-    
-    func appendOriginalImage(image: UIImage) {
+    private func appendOriginalImage(image: UIImage) {
         do{
             try scanServiceProvider.getImage(image: image)
         } catch {
@@ -93,6 +165,23 @@ extension MainViewController: MainViewDelegate {
     }
 }
 
+//MARK: - MainViewDelegate
+extension MainViewController: MainViewDelegate {
+    
+    func pushSaveButton() {
+        requestPhotoLibraryAcess()
+    }
+    
+    func pushViewControllerAction() {
+        navigationController?.pushViewController(PreviewController(scanServiceProvider: scanServiceProvider), animated: true)
+    }
+    
+    func cantAddCameraViewAction() {
+        print("cantAddCameraView")
+    }
+}
+
+//MARK: - AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
 extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {

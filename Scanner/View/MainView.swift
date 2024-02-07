@@ -10,6 +10,8 @@ import AVFoundation
 
 protocol MainViewDelegate: AnyObject {
     func pushSaveButton()
+    func cantAddCameraViewAction()
+    func pushViewControllerAction()
 }
 
 final class MainView: UIView {
@@ -128,7 +130,7 @@ extension MainView {
         NSLayoutConstraint.activate(thumbnailViewConstraint)
         
         thumbnailView.isUserInteractionEnabled = true
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(pushSaveButton))
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(pushThumbnailView))
         thumbnailView.addGestureRecognizer(tapGestureRecognizer)
         
     }
@@ -168,57 +170,6 @@ extension MainView {
             imageCountLabel.centerYAnchor.constraint(equalTo: imageCountView.centerYAnchor),
         ])
     }
-}
-
-extension MainView {
-    
-    func addCameraViewLayer(subLayer: CALayer) {
-        cameraView.layer.addSublayer(subLayer)
-    }
-    
-    func updateThumbnail(image: UIImage, imagesCount: Int) {
-        thumbnailView.image = image
-        
-        if imagesCount > 0 {
-            imageCountView.isHidden = false
-        } else {
-            imageCountView.isHidden = true
-        }
-        
-        imageCountLabel.text = "\(imagesCount)"
-    }
-}
-
-//MARK: - objc Button Action
-extension MainView {
-    
-    @objc private func capture() {
-         guard let delegate = delegate,
-               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
-         let settings = AVCapturePhotoSettings()
-         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
-     }
-    
-    @objc private func pushSaveButton() {
-        delegate?.pushSaveButton()
-    }
-}
-
-extension MainView {
-
-    func drawRect(cgPoints: [CGPoint]) {
-        let outLine = UIBezierPath()
-        outLine.move(to: cgPoints[0])
-        outLine.addLine(to: cgPoints[1])
-        outLine.addLine(to: cgPoints[2])
-        outLine.addLine(to: cgPoints[3])
-        outLine.addLine(to: cgPoints[0])
-        
-        alphaLayer.path = outLine.cgPath
-        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
-        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
-        alphaLayer.lineWidth = 4
-    }
     
     private func configureCaptureSassion() {
         do {
@@ -238,6 +189,7 @@ extension MainView {
                 throw CameraError.cantAddDeviceInput
             }
         } catch {
+            delegate?.cantAddCameraViewAction()
             print(error)
         }
     }
@@ -256,6 +208,7 @@ extension MainView {
                 throw CameraError.cantAddPhotoOutput
             }
         } catch {
+            delegate?.cantAddCameraViewAction()
             print(error)
         }
     }
@@ -265,15 +218,68 @@ extension MainView {
             guard let delegate = delegate, let videoDataOutputDelegate = delegate as? AVCaptureVideoDataOutputSampleBufferDelegate else { return }
             
             videoOutput.setSampleBufferDelegate(videoDataOutputDelegate, queue: DispatchQueue(label: "VideoQueue"))
-            
             if captureSession.canAddOutput(videoOutput) {
                 captureSession.addOutput(videoOutput)
             } else {
                 throw CameraError.cantAddVideoOutput
             }
         } catch {
+            delegate?.cantAddCameraViewAction()
             print(error)
         }
+    }
+}
+
+//MARK: - objc Button Action
+extension MainView {
+    
+    @objc private func capture() {
+         guard let delegate = delegate,
+               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
+         let settings = AVCapturePhotoSettings()
+         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
+     }
+    
+    @objc private func pushThumbnailView() {
+        delegate?.pushViewControllerAction()
+    }
+    
+    @objc private func pushSaveButton() {
+        delegate?.pushSaveButton()
+    }
+}
+
+//MARK: - UI Update
+extension MainView {
+    
+    func addCameraViewLayer(subLayer: CALayer) {
+        cameraView.layer.addSublayer(subLayer)
+    }
+    
+    func updateThumbnail(image: UIImage, imagesCount: Int) {
+        thumbnailView.image = image
+        
+        if imagesCount > 0 {
+            imageCountView.isHidden = false
+        } else {
+            imageCountView.isHidden = true
+        }
+        
+        imageCountLabel.text = "\(imagesCount)"
+    }
+    
+    func drawRect(cgPoints: [CGPoint]) {
+        let outLine = UIBezierPath()
+        outLine.move(to: cgPoints[0])
+        outLine.addLine(to: cgPoints[1])
+        outLine.addLine(to: cgPoints[2])
+        outLine.addLine(to: cgPoints[3])
+        outLine.addLine(to: cgPoints[0])
+        
+        alphaLayer.path = outLine.cgPath
+        alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
+        alphaLayer.strokeColor = UIColor(resource: .main).cgColor
+        alphaLayer.lineWidth = 4
     }
     
     func captureStartRunning() {
@@ -283,5 +289,4 @@ extension MainView {
     func captureStopRunning() {
         captureSession.stopRunning()
     }
-
 }

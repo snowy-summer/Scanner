@@ -25,6 +25,7 @@ final class Preview: UIView {
     }
 }
 
+//MARK: - configuration
 extension Preview {
     
     private func configureImageView() {
@@ -69,6 +70,11 @@ extension Preview {
         self.addGestureRecognizer(swipeRight)
         
     }
+}
+
+//MARK: - UI Update
+
+extension Preview {
     
     func updateImageView(image: UIImage) {
         imageView.image = image
