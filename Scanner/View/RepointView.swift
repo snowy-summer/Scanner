@@ -61,6 +61,8 @@ extension RepointView {
         alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
         alphaLayer.strokeColor = UIColor(resource: .main).cgColor
         alphaLayer.lineWidth = 4
+        
+        imageView.layer.addSublayer(alphaLayer)
     }
 }
 

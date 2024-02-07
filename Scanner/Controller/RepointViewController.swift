@@ -21,19 +21,23 @@ final class RepointViewController: UIViewController {
     }
     
     override func loadView() {
+        super.loadView()
         view = repointView
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         view.backgroundColor = .gray
         navigationController?.navigationBar.isHidden = true
-        guard let image = scanServiceProvider.originalImages.last else {
-            //촬영한 이미지가 없다고 알려야 할듯
-            return
-        }
+        guard let image = scanServiceProvider.originalImages.last else { return }
         
         repointView.updateUI(image: image)
         setupToolBarButton()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        guard let image = scanServiceProvider.originalImages.last else { return }
         drawRectOnRepointView(image: image)
     }
 }
@@ -89,7 +93,6 @@ extension RepointViewController {
             let viewSize = repointView.imageView.bounds.size
             
             let points = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
-            
             repointView.drawRect(cgPoints: points)
             
         } catch {

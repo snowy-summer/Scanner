@@ -67,9 +67,6 @@ extension ScanServiceProvider {
         
         let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
         
-        let origin = CGPoint(x: image.size.width / 2,
-                             y: image.size.height / 2)
-        
         let pointArray = [
             rectangleFeature.topLeft,
             rectangleFeature.topRight,
@@ -77,53 +74,21 @@ extension ScanServiceProvider {
             rectangleFeature.bottomLeft,
         ]
         
-        let rotatedPoints =  rotatePoints(degrees: 270, points: pointArray, aroundOrigin: origin)
-        let fitToUiKitCoordinates = fitToUikitCoordinate(image: image, viewSize: viewSize, of: rotatedPoints)
+        let fitToUiKitCoordinates = fitToUikitCoordinate(image: image, viewSize: viewSize, of: pointArray)
         
         return fitToUiKitCoordinates
     }
     
     private func fitToUikitCoordinate(image: UIImage, viewSize: CGSize, of rectanglePoints: [CGPoint]) -> [CGPoint] {
         let imageSize = image.size
-        let scale = 0.75
         
         let scaleX = imageSize.width / viewSize.width
-        let scaleY = imageSize.height * scale / viewSize.height
+        let scaleY = imageSize.height / viewSize.height
         
-        let my = viewSize.height / 2
-        
-        let ratioPoints =  rectanglePoints.map { CGPoint(x: $0.x / scaleX,
-                                                         y: ($0.y / scaleY / 2)) }
-        let flippedYPoints = ratioPoints.map{ CGPoint(x: $0.x,
-                                                      y: my - ($0.y - my)) }
-        
-        let subY = (flippedYPoints[1].y - flippedYPoints[0].y) / 2
-        let subX = (flippedYPoints[0].x - flippedYPoints[3].x) / 2
-        
-        var adjustedPoints = flippedYPoints
-        adjustedPoints[0].x += subX
-        adjustedPoints[1].x += subX
-        adjustedPoints[2].x -= subX
-        adjustedPoints[3].x -= subX
-        
-        adjustedPoints = adjustedPoints.map { CGPoint(x: $0.x, y: $0.y - subY) }
+        var adjustedPoints = rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
+        adjustedPoints[0].y -= 22
+        adjustedPoints[1].y -= 22
         
         return adjustedPoints
-        
-    }
-    
-    private func rotatePoints(degrees: CGFloat, points: [CGPoint], aroundOrigin origin: CGPoint) -> [CGPoint] {
-        let radians = degrees * CGFloat.pi / 180
-        return points.map { point in
-            let translatedPoint = CGPoint(x: point.x - origin.x, y: point.y - origin.y)
-            let affineTransform = CGAffineTransform(rotationAngle: radians)
-            
-            let rotatedPoint = CGPoint(
-                x: affineTransform.a * translatedPoint.x + affineTransform.c * translatedPoint.y,
-                y: affineTransform.b * translatedPoint.x + affineTransform.d * translatedPoint.y
-            )
-            
-            return CGPoint(x: rotatedPoint.x + origin.x, y: rotatedPoint.y + origin.y)
-        }
     }
 }

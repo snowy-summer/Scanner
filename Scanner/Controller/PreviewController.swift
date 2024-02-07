@@ -20,15 +20,18 @@ final class PreviewController: UIViewController {
     }
     
     override func loadView() {
+        super.loadView()
         view = preview
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = false
         navigationController?.navigationBar.isHidden = false
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         view.backgroundColor = .gray
         preview.updateImageView(image: scanServiceProvider.readScannedImage())
         preview.updatePageControlPage(numberOfPage: scanServiceProvider.scannedImages.count)

@@ -17,6 +17,7 @@ final class MainViewController: UIViewController {
     private var afterPoints = [CGPoint]()
     
     override func loadView() {
+        super.loadView()
         view = mainView
     }
     
@@ -30,6 +31,7 @@ final class MainViewController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
         //TODO: 카메라 전환이 부드럽지 못함
         
@@ -39,6 +41,7 @@ final class MainViewController: UIViewController {
     }
     
     override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         mainView.captureStopRunning()
     }
 }
@@ -102,7 +105,7 @@ extension MainViewController {
     private func requestPhotoLibraryAcess() {
 
         PHPhotoLibrary.shared().performChanges({
-               let request = PHAssetCreationRequest.forAsset()
+//               let request = PHAssetCreationRequest.forAsset()
 //            request.addResource(with: <#T##PHAssetResourceType#>, data: <#T##Data#>, options: <#T##PHAssetResourceCreationOptions?#>)
 
                
@@ -136,6 +139,7 @@ extension MainViewController {
         do {
             let viewSize = mainView.cameraView.bounds.size
             afterPoints = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
+            
             if beforePoints.isEmpty {
                 beforePoints = afterPoints
             }
@@ -194,6 +198,12 @@ extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataO
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                let orientation = windowScene.interfaceOrientation
+                output.connection(with: .video)?.videoOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) ?? .portrait
+            }
+        }
         
         guard let pixelBuffer: CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
