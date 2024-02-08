@@ -16,7 +16,7 @@ enum DetectorError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .failToDetectRectangle:
-            return "cantFindRectangle: 사각형을 찾지 못했습니다."
+            return "failFindRectangle: 사각형을 찾지 못했습니다."
         case .failToConvertMonoImage:
             return "failToConvertMonoImage: 흑백 이미지변환 실패했습니다."
         case .failToGetPerspectiveCorrectionImage:

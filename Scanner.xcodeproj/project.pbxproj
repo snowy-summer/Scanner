@@ -16,7 +16,6 @@
 		6B4E5EEE2B6CCB0200229F1D /* CIFilterKeyName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */; };
 		6B4E5EF12B6CCBE400229F1D /* RectangleDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B4E5EF02B6CCBE400229F1D /* RectangleDetector.swift */; };
 		6BC24CA92B6B3B020078EAB9 /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC24CA82B6B3B020078EAB9 /* Preview.swift */; };
-		6BC24CAD2B6BA5300078EAB9 /* MainViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC24CAC2B6BA5300078EAB9 /* MainViewDelegate.swift */; };
 		6BC24CB12B6BAE190078EAB9 /* ScanServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */; };
 		6BEE74BD2B6A13FD009F36D2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE74BC2B6A13FD009F36D2 /* AppDelegate.swift */; };
 		6BEE74BF2B6A13FD009F36D2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BEE74BE2B6A13FD009F36D2 /* SceneDelegate.swift */; };
@@ -37,7 +36,6 @@
 		6B4E5EED2B6CCB0200229F1D /* CIFilterKeyName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CIFilterKeyName.swift; sourceTree = "<group>"; };
 		6B4E5EF02B6CCBE400229F1D /* RectangleDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleDetector.swift; sourceTree = "<group>"; };
 		6BC24CA82B6B3B020078EAB9 /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
-		6BC24CAC2B6BA5300078EAB9 /* MainViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewDelegate.swift; sourceTree = "<group>"; };
 		6BC24CB02B6BAE190078EAB9 /* ScanServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanServiceProvider.swift; sourceTree = "<group>"; };
 		6BEE74B92B6A13FD009F36D2 /* Scanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6BEE74BC2B6A13FD009F36D2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -130,7 +128,6 @@
 		6BC24CAB2B6BA5030078EAB9 /* Delegate */ = {
 			isa = PBXGroup;
 			children = (
-				6BC24CAC2B6BA5300078EAB9 /* MainViewDelegate.swift */,
 			);
 			path = Delegate;
 			sourceTree = "<group>";
@@ -244,7 +241,6 @@
 				6B4E5EEE2B6CCB0200229F1D /* CIFilterKeyName.swift in Sources */,
 				6B10A5062B6BBC5C00E03E18 /* RepointViewController.swift in Sources */,
 				6B4E5EE72B6C78A200229F1D /* UIImage++Extension.swift in Sources */,
-				6BC24CAD2B6BA5300078EAB9 /* MainViewDelegate.swift in Sources */,
 				6BEE74D12B6A2B49009F36D2 /* MainView.swift in Sources */,
 				6B10A5042B6BB92600E03E18 /* RepointView.swift in Sources */,
 				6BC24CB12B6BAE190078EAB9 /* ScanServiceProvider.swift in Sources */,

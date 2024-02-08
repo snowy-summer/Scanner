@@ -16,6 +16,8 @@ final class MainViewController: UIViewController {
     private var beforePoints = [CGPoint]()
     private var afterPoints = [CGPoint]()
     
+    var frame = UIImage()
+    
     override func loadView() {
         super.loadView()
         view = mainView
@@ -152,10 +154,13 @@ extension MainViewController {
                     beforePoints[i].y = afterPoints[i].y
                 }
             }
-            
+            mainView.alpahLayerHiddenOff()
             mainView.drawRect(cgPoints: beforePoints)
             
         } catch {
+            if error as? DetectorError == DetectorError.failToDetectRectangle {
+                mainView.alpahLayerHiddenOn()
+            }
             print(error)
         }
     }
@@ -183,6 +188,11 @@ extension MainViewController: MainViewDelegate {
     func cantAddCameraViewAction() {
         print("cantAddCameraView")
     }
+    
+    func getFrameImage() {
+        appendOriginalImage(image: frame)
+        mainView.updateThumbnail(image: frame, imagesCount: scanServiceProvider.originalImages.count)
+    }
 }
 
 //MARK: - AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
@@ -198,16 +208,11 @@ extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataO
     }
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-        DispatchQueue.main.async {
-            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                let orientation = windowScene.interfaceOrientation
-                output.connection(with: .video)?.videoOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) ?? .portrait
-            }
-        }
         
         guard let pixelBuffer: CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let image = UIImage(ciImage: ciImage)
+        frame = image
         
         DispatchQueue.main.async { [weak self] in
             self?.drawRectOnCameraPreview(image: image)

@@ -36,27 +36,16 @@ extension ScanServiceProvider {
         scannedImages.append(scannedImage)
     }
     
-    private func convertToMono(image: UIImage) throws -> CGImage {
-        guard let ciImage = CIImage(image: image) else { throw ScannerError.convertToCIImageError }
-        
-        guard let outputImage =  rectangleDetector.convertToMono(ciImage: ciImage) else { throw DetectorError.failToConvertMonoImage }
-        
-        let context = CIContext(options: nil)
-        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
-        
-        return cgImage
-    }
-    
     private func detectRectangleAndCorrectPerspective(image: UIImage) throws -> UIImage {
-        guard let ciImage = CIImage(image: image) else { throw ScannerError.convertToCIImageError }
+//        guard let ciImage = CIImage(image: image) else { throw ScannerError.convertToCIImageError }
+        guard let ciImage = image.ciImage else { throw ScannerError.convertToCIImageError }
         
         let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
         let outputImage = try rectangleDetector.getPrepectiveImage(ciImage: ciImage, feature: rectangleFeature)
         let context = CIContext(options: nil)
         guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
-        return UIImage(cgImage: cgImage).rotate(degrees: 90)
+        return UIImage(cgImage: cgImage)
     }
-    
 }
 
 //MARK: - 좌표값 얻기
@@ -86,8 +75,8 @@ extension ScanServiceProvider {
         let scaleY = imageSize.height / viewSize.height
         
         var adjustedPoints = rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
-        adjustedPoints[0].y -= 22
-        adjustedPoints[1].y -= 22
+//        adjustedPoints[0].y -= 22
+//        adjustedPoints[1].y -= 22
         
         return adjustedPoints
     }

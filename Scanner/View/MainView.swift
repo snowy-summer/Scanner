@@ -12,6 +12,7 @@ protocol MainViewDelegate: AnyObject {
     func pushSaveButton()
     func cantAddCameraViewAction()
     func pushViewControllerAction()
+    func getFrameImage()
 }
 
 final class MainView: UIView {
@@ -57,8 +58,6 @@ extension MainView {
     override func layoutSubviews() {
         super.layoutSubviews()
         previewLayer.frame = cameraView.bounds
-        alphaLayer.removeFromSuperlayer()
-        previewLayer.addSublayer(alphaLayer)
     }
     
     private func configureCameraView() {
@@ -173,8 +172,13 @@ extension MainView {
     
     private func configureCaptureSassion() {
         do {
-            
-            captureSession.sessionPreset = .high
+            if captureSession.canSetSessionPreset(.high) {
+                captureSession.sessionPreset = .high
+            } else if captureSession.canSetSessionPreset(.medium) {
+                captureSession.sessionPreset = .medium
+            } else {
+                captureSession.sessionPreset = .low
+            }
             
             guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                            for: .video,
@@ -198,6 +202,7 @@ extension MainView {
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.videoGravity = .resizeAspectFill
         cameraView.layer.addSublayer(previewLayer)
+        cameraView.layer.addSublayer(alphaLayer)
     }
     
     private func configurePhotoOutput() {
@@ -215,7 +220,15 @@ extension MainView {
     
     func configureVideoOutput() {
         do {
-            guard let delegate = delegate, let videoDataOutputDelegate = delegate as? AVCaptureVideoDataOutputSampleBufferDelegate else { return }
+            guard let delegate = delegate,
+                  let videoDataOutputDelegate = delegate as? AVCaptureVideoDataOutputSampleBufferDelegate else { return }
+            
+            DispatchQueue.main.async { [weak self] in
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                    let orientation = windowScene.interfaceOrientation
+                    self?.videoOutput.connection(with: .video)?.videoOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) ?? .portrait
+                }
+            }
             
             videoOutput.setSampleBufferDelegate(videoDataOutputDelegate, queue: DispatchQueue(label: "VideoQueue"))
             if captureSession.canAddOutput(videoOutput) {
@@ -234,10 +247,12 @@ extension MainView {
 extension MainView {
     
     @objc private func capture() {
-         guard let delegate = delegate,
-               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
-         let settings = AVCapturePhotoSettings()
-         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
+//         guard let delegate = delegate,
+//               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
+//         let settings = AVCapturePhotoSettings()
+//         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
+        delegate?.getFrameImage()
+        
      }
     
     @objc private func pushThumbnailView() {
@@ -274,7 +289,8 @@ extension MainView {
         outLine.addLine(to: cgPoints[1])
         outLine.addLine(to: cgPoints[2])
         outLine.addLine(to: cgPoints[3])
-        outLine.addLine(to: cgPoints[0])
+        outLine.close()
+        outLine.lineJoinStyle = .round
         
         alphaLayer.path = outLine.cgPath
         alphaLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
@@ -288,5 +304,17 @@ extension MainView {
     
     func captureStopRunning() {
         captureSession.stopRunning()
+    }
+    
+    func alpahLayerHiddenOff() {
+        if alphaLayer.isHidden == true {
+            alphaLayer.isHidden = false
+        }
+    }
+    
+    func alpahLayerHiddenOn() {
+        if alphaLayer.isHidden == false {
+            alphaLayer.isHidden = true
+        }
     }
 }

@@ -27,8 +27,9 @@ final class RepointViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         view.backgroundColor = .gray
-        navigationController?.navigationBar.isHidden = true
+//        navigationController?.navigationBar.isHidden = true
         guard let image = scanServiceProvider.originalImages.last else { return }
         
         repointView.updateUI(image: image)
