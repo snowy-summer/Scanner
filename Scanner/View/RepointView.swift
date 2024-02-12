@@ -63,19 +63,19 @@ extension RepointView {
     }
     
     func drawRect(cgPoints: [CGPoint]) {
-
+        
         imageView.layer.addSublayer(rectLayer)
         
         topLeftControlView.configureCircle(on: imageView, within: self, center: cgPoints[0])
         topRightControlView.configureCircle(on: imageView, within: self, center: cgPoints[1])
-       
+        
         bottomRightControlView.configureCircle(on: imageView, within: self, center: cgPoints[2])
         bottomLeftControlView.configureCircle(on: imageView, within: self, center: cgPoints[3])
         drawLine()
     }
     
-    func drawLine() {
-       
+    private func drawLine() {
+        
         let outLine = UIBezierPath()
         
         outLine.move(to: topLeftControlView.center)
@@ -89,6 +89,17 @@ extension RepointView {
         rectLayer.fillColor = UIColor(resource: .sub).withAlphaComponent(0.2).cgColor
         rectLayer.strokeColor = UIColor(resource: .main).cgColor
         rectLayer.lineWidth = 4
+    }
+    
+    func getRectPoints() -> [CGPoint] {
+        let rectPoints = [
+            topLeftControlView.center,
+            topRightControlView.center,
+            bottomRightControlView.center,
+            bottomLeftControlView.center
+        ]
+        
+        return rectPoints
     }
 }
 
@@ -111,12 +122,13 @@ final class ControlCircle: UIView {
         DispatchQueue.main.async {
             self.center = point
         }
+        
     }
     
     func configureCircle(on targetView: UIView, within containerView: UIView, center: CGPoint) {
         targetView.addSubview(self)
         self.backgroundColor = .green.withAlphaComponent(0.5)
-        let circleWidth = containerView.bounds.size.width * 0.15
+        let circleWidth = containerView.bounds.size.width * 0.1
         
         self.bounds = CGRect(origin: CGPoint(x: 0,
                                              y: 0),

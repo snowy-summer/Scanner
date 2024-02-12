@@ -46,6 +46,18 @@ extension ScanServiceProvider {
         guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
         return UIImage(cgImage: cgImage)
     }
+    
+    func getCorrectPerspectiveImage(image: UIImage, rectPoints: [CGPoint]) throws -> UIImage {
+
+        guard let ciImage = image.ciImage else { throw ScannerError.convertToCIImageError }
+        
+        let outputImage = try rectangleDetector.getPrepectiveImage(ciImage: ciImage, points: rectPoints)
+        let context = CIContext(options: nil)
+        guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
+        return UIImage(cgImage: cgImage)
+    }
+    
+    
 }
 
 //MARK: - 좌표값 얻기

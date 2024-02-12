@@ -80,7 +80,14 @@ extension RepointViewController {
 
 extension RepointViewController {
     @objc private func doneAction() {
-
+        do {
+            let rectPoints = repointView.getRectPoints()
+            guard let beforeImage = repointView.imageView.image else { return }
+            let image = try scanServiceProvider.getCorrectPerspectiveImage(image: beforeImage, rectPoints: rectPoints)
+            repointView.updateUI(image: image)
+        } catch {
+            print(error)
+        }
     }
     
     @objc private func undoAction() {
