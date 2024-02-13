@@ -9,9 +9,10 @@ import UIKit
 
 final class Preview: UIView {
     private let imageView = UIImageView()
-    private let pageControl = UIPageControl()
+    private(set) var pageControl = UIPageControl()
+    weak var delegate: PreviewDelegate?
     
-    var images = [UIImage]()
+    var scannedImages = [UIImage]()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,6 +33,7 @@ extension Preview {
         self.addSubview(imageView)
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
         let safeArea = self.safeAreaLayoutGuide
         
         NSLayoutConstraint.activate([
@@ -42,7 +44,7 @@ extension Preview {
         ])
     }
     
-    func configurePageControl() {
+   private func configurePageControl() {
         self.addSubview(pageControl)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         
@@ -60,7 +62,7 @@ extension Preview {
         pageControl.currentPageIndicatorTintColor = UIColor.black
     }
     
-    func configureSwipeGesture() {
+   private func configureSwipeGesture() {
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture(_:)))
         swipeLeft.direction = UISwipeGestureRecognizer.Direction.left
         self.addGestureRecognizer(swipeLeft)
@@ -80,6 +82,11 @@ extension Preview {
         imageView.image = image
     }
     
+    func currentImageOfImageView() -> UIImage? {
+        
+        return imageView.image
+    }
+    
     func updatePageControlPage(numberOfPage: Int) {
         pageControl.numberOfPages = numberOfPage
     }
@@ -91,15 +98,17 @@ extension Preview {
             case UISwipeGestureRecognizer.Direction.left:
                 if pageControl.currentPage <= pageControl.numberOfPages {
                     pageControl.currentPage += 1
+                    delegate?.changeNavigationTitle()
                 }
                 
-                imageView.image = images[pageControl.currentPage]
+                imageView.image = scannedImages[pageControl.currentPage]
             case UISwipeGestureRecognizer.Direction.right:
                 if pageControl.currentPage <= pageControl.numberOfPages && 0 < pageControl.currentPage {
                     pageControl.currentPage -= 1
+                    delegate?.changeNavigationTitle()
                 }
                 
-                imageView.image = images[pageControl.currentPage]
+                imageView.image = scannedImages[pageControl.currentPage]
             default:
                 break
             }

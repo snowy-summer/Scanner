@@ -12,7 +12,7 @@ protocol MainViewDelegate: AnyObject {
     func pushSaveButton()
     func cantAddCameraViewAction()
     func pushViewControllerAction()
-    func getFrameImage()
+    func appendVideoFrameImage()
 }
 
 final class MainView: UIView {
@@ -29,6 +29,7 @@ final class MainView: UIView {
     private let videoOutput = AVCaptureVideoDataOutput()
     private let alphaLayer = CAShapeLayer()
     
+    private let mainQueue = DispatchQueue.main
     weak var delegate: MainViewDelegate?
     
     init() {
@@ -80,7 +81,6 @@ extension MainView {
         let buttonSymbol = UIImage.SymbolConfiguration(pointSize: 60, weight: .regular)
         captureButton.setImage(UIImage(systemName: "camera.aperture", withConfiguration: buttonSymbol), for: .normal)
         captureButton.addTarget(self, action: #selector(capture), for: .touchUpInside)
-        captureButton.tintColor = .white
         
         self.addSubview(captureButton)
         captureButton.translatesAutoresizingMaskIntoConstraints = false
@@ -97,7 +97,6 @@ extension MainView {
     
     private func configureSaveButton() {
         saveButton.setTitle("저장", for: .normal)
-        saveButton.setTitleColor(.white, for: .normal)
         saveButton.addTarget(self, action: #selector(pushSaveButton), for: .touchUpInside)
         
         self.addSubview(saveButton)
@@ -223,7 +222,7 @@ extension MainView {
             guard let delegate = delegate,
                   let videoDataOutputDelegate = delegate as? AVCaptureVideoDataOutputSampleBufferDelegate else { return }
             
-            DispatchQueue.main.async { [weak self] in
+            mainQueue.async { [weak self] in
                 if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
                     let orientation = windowScene.interfaceOrientation
                     self?.videoOutput.connection(with: .video)?.videoOrientation = AVCaptureVideoOrientation(rawValue: orientation.rawValue) ?? .portrait
@@ -251,7 +250,7 @@ extension MainView {
 //               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
 //         let settings = AVCapturePhotoSettings()
 //         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
-        delegate?.getFrameImage()
+        delegate?.appendVideoFrameImage()
         
      }
     

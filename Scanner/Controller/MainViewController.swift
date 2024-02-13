@@ -7,7 +7,6 @@
 
 import UIKit
 import AVFoundation
-import Photos
 
 final class MainViewController: UIViewController {
     private var mainView = MainView()
@@ -15,8 +14,11 @@ final class MainViewController: UIViewController {
     private let scanServiceProvider = ScanServiceProvider()
     private var beforePoints = [CGPoint]()
     private var afterPoints = [CGPoint]()
+    private var frameImage = UIImage()
     
-    var frame = UIImage()
+    private let mainQueue = DispatchQueue.main
+    private let cameraQueue = DispatchQueue.global()
+    
     
     override func loadView() {
         super.loadView()
@@ -37,7 +39,7 @@ final class MainViewController: UIViewController {
         navigationController?.isToolbarHidden = true
         //TODO: 카메라 전환이 부드럽지 못함
         
-        DispatchQueue.global().async { [weak self] in
+        cameraQueue.async { [weak self] in
             self?.mainView.captureStartRunning()
         }
     }
@@ -60,7 +62,7 @@ extension MainViewController {
                                            style: .plain,
                                            target: self,
                                            action: #selector(cancelAction))
-        cancelButton.tintColor = .white
+        
         navigationItem.leftBarButtonItem = cancelButton
         navigationItem.rightBarButtonItem = captureTypeButton
         navigationController?.navigationBar.tintColor = .black
@@ -76,9 +78,9 @@ extension MainViewController {
     }
     
     private func requestCameraAccess() {
-        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (result) in
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: { [weak self] (result) in
             if !result {
-                DispatchQueue.main.async { [weak self] in
+                self?.mainQueue.async {
                     self?.requestCameraAccessAlert()
                 }
             }
@@ -105,19 +107,12 @@ extension MainViewController {
     }
     
     private func requestPhotoLibraryAcess() {
-
-        PHPhotoLibrary.shared().performChanges({
-//               let request = PHAssetCreationRequest.forAsset()
-//            request.addResource(with: <#T##PHAssetResourceType#>, data: <#T##Data#>, options: <#T##PHAssetResourceCreationOptions?#>)
-
-               
-           }, completionHandler: { success, error in
-               if success {
-                   print("성공")
-               } else {
-                   print("실패")
-               }
-           })
+        
+        let scannedImages = scanServiceProvider.originalImages
+        
+        for i in scannedImages {
+            UIImageWriteToSavedPhotosAlbum(i, nil, nil, nil)
+        }
     }
 
     private func requestPhotoLibraryAccessAlert() {
@@ -189,9 +184,9 @@ extension MainViewController: MainViewDelegate {
         print("cantAddCameraView")
     }
     
-    func getFrameImage() {
-        appendOriginalImage(image: frame)
-        mainView.updateThumbnail(image: frame, imagesCount: scanServiceProvider.originalImages.count)
+    func appendVideoFrameImage() {
+        appendOriginalImage(image: frameImage)
+        mainView.updateThumbnail(image: frameImage, imagesCount: scanServiceProvider.originalImages.count)
     }
 }
 
@@ -212,9 +207,9 @@ extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataO
         guard let pixelBuffer: CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let image = UIImage(ciImage: ciImage)
-        frame = image
+        frameImage = image
         
-        DispatchQueue.main.async { [weak self] in
+        mainQueue.async { [weak self] in
             self?.drawRectOnCameraPreview(image: image)
             self?.mainView.layoutSubviews()
         }

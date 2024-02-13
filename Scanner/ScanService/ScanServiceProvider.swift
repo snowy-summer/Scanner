@@ -24,6 +24,14 @@ final class ScanServiceProvider {
         originalImages.removeAll()
         scannedImages.removeAll()
     }
+    
+    func changeImage(image: UIImage, at: Int) {
+        scannedImages[at] = image
+    }
+    
+    func deleteImage(at: Int) {
+        scannedImages.remove(at: at)
+    }
 }
 
 //MARK: - image 얻기
@@ -86,7 +94,7 @@ extension ScanServiceProvider {
         let scaleX = imageSize.width / viewSize.width
         let scaleY = imageSize.height / viewSize.height
         
-        var adjustedPoints = rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
+        let adjustedPoints = rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
 //        adjustedPoints[0].y -= 22
 //        adjustedPoints[1].y -= 22
         

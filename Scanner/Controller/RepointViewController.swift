@@ -29,11 +29,11 @@ final class RepointViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .gray
-//        navigationController?.navigationBar.isHidden = true
         guard let image = scanServiceProvider.originalImages.last else { return }
+        navigationController?.isToolbarHidden = true
         
         repointView.updateUI(image: image)
-        setupToolBarButton()
+        setupNavigationBarButton()
     }
     
     override func viewDidLayoutSubviews() {
@@ -46,33 +46,20 @@ final class RepointViewController: UIViewController {
 //MARK: - configuration
 
 extension RepointViewController {
-   private func setupToolBarButton() {
-
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace,
-                                            target: nil,
-                                            action: nil)
-  
-        let undoButton = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"),
-                                         style: .plain,
-                                           target: self,
-                                           action: #selector(undoAction))
+   private func setupNavigationBarButton() {
         
         let doneButton = UIBarButtonItem(image: UIImage(systemName: "checkmark"),
                                          style: .plain,
                                          target: self,
                                          action: #selector(doneAction))
-        
-        let fixedButtonSpace = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-        fixedButtonSpace.width = undoButton.width
-        
-
-        
-        
-        let barItems = [ flexibleSpace, undoButton,
-                         flexibleSpace, flexibleSpace, fixedButtonSpace, flexibleSpace, flexibleSpace,
-                         doneButton, flexibleSpace ]
-
-        toolbarItems = barItems
+       
+       let backButton = UIBarButtonItem(image: UIImage(systemName: "arrowshape.backward"),
+                                         style: .plain,
+                                         target: self,
+                                         action: #selector(undoAction))
+       
+       navigationItem.leftBarButtonItem = backButton
+       navigationItem.rightBarButtonItem = doneButton
     }
 }
 
