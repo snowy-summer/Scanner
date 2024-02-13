@@ -37,11 +37,17 @@ final class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = true
+        
         //TODO: 카메라 전환이 부드럽지 못함
         
         cameraQueue.async { [weak self] in
             self?.mainView.captureStartRunning()
         }
+        guard let thumbnail = scanServiceProvider.originalImages.last else {
+            mainView.updateThumbnail(image: UIImage(), imagesCount: 0)
+            return
+        }
+        mainView.updateThumbnail(image: thumbnail, imagesCount: scanServiceProvider.originalImages.count)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -162,8 +168,9 @@ extension MainViewController {
     
     private func appendOriginalImage(image: UIImage) {
         do{
-            try scanServiceProvider.getImage(image: image)
+            try scanServiceProvider.appendScannedImage(image: image)
         } catch {
+            scanServiceProvider.appendOriginalImage(image: image)
             print(error)
         }
     }

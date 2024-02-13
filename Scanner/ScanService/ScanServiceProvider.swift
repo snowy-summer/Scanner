@@ -15,11 +15,6 @@ final class ScanServiceProvider {
     
     //MARK: - Test용 데이터 메소드
     
-    func readScannedImage() -> UIImage {
-        guard let image = scannedImages.last else { return UIImage() }
-        return image
-    }
-    
     func clearImages() {
         originalImages.removeAll()
         scannedImages.removeAll()
@@ -29,19 +24,23 @@ final class ScanServiceProvider {
         scannedImages[at] = image
     }
     
-    func deleteImage(at: Int) {
-        scannedImages.remove(at: at)
+    func deleteImage(at index: Int) {
+        originalImages.remove(at: index)
+        scannedImages.remove(at: index)
     }
 }
 
 //MARK: - image 얻기
 extension ScanServiceProvider {
     
-    func getImage(image: UIImage) throws {
+    func appendScannedImage(image: UIImage) throws {
         originalImages.append(image)
         
         let scannedImage = try detectRectangleAndCorrectPerspective(image: image)
         scannedImages.append(scannedImage)
+    }
+    func appendOriginalImage(image: UIImage) {
+        scannedImages.append(image)
     }
     
     private func detectRectangleAndCorrectPerspective(image: UIImage) throws -> UIImage {

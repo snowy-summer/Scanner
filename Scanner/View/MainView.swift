@@ -84,6 +84,7 @@ extension MainView {
         
         self.addSubview(captureButton)
         captureButton.translatesAutoresizingMaskIntoConstraints = false
+        captureButton.tintColor = UIColor.black
         
         let captureButtonConstraint = [
             captureButton.topAnchor.constraint(equalTo: cameraView.bottomAnchor),
@@ -101,6 +102,7 @@ extension MainView {
         
         self.addSubview(saveButton)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
+        saveButton.setTitleColor(.black, for: .normal)
         
         let saveButtonConstraint = [
             saveButton.leadingAnchor.constraint(equalTo: captureButton.trailingAnchor, constant: 24),

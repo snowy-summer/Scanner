@@ -12,8 +12,6 @@ final class Preview: UIView {
     private(set) var pageControl = UIPageControl()
     weak var delegate: PreviewDelegate?
     
-    var scannedImages = [UIImage]()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureImageView()
@@ -101,14 +99,14 @@ extension Preview {
                     delegate?.changeNavigationTitle()
                 }
                 
-                imageView.image = scannedImages[pageControl.currentPage]
+                imageView.image = delegate?.getImageFromScannedImages(at: pageControl.currentPage)
             case UISwipeGestureRecognizer.Direction.right:
                 if pageControl.currentPage <= pageControl.numberOfPages && 0 < pageControl.currentPage {
                     pageControl.currentPage -= 1
                     delegate?.changeNavigationTitle()
                 }
                 
-                imageView.image = scannedImages[pageControl.currentPage]
+                imageView.image = delegate?.getImageFromScannedImages(at: pageControl.currentPage)
             default:
                 break
             }
