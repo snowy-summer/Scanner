@@ -33,8 +33,9 @@ final class PreviewController: UIViewController {
         super.viewWillAppear(animated)
         navigationController?.isToolbarHidden = false
         navigationController?.navigationBar.isHidden = false
-        
-        preview.updateImageView(image: scanServiceProvider.scannedImages[scanServiceProvider.currentIndex])
+        if !scanServiceProvider.scannedImages.isEmpty {
+            preview.updateImageView(image: scanServiceProvider.scannedImages[scanServiceProvider.currentIndex])
+        }
         
     }
     
@@ -120,7 +121,6 @@ extension PreviewController {
     }
     
     @objc private func deleteAction() {
-        // TODO: 사진삭제 -> 다음 사진 보여줘야함
         if !scanServiceProvider.scannedImages.isEmpty {
             scanServiceProvider.deleteImage(at: preview.pageControl.currentPage)
             preview.updatePageControlPage(numberOfPage: scanServiceProvider.scannedImages.count)

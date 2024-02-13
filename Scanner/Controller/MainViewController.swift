@@ -197,18 +197,8 @@ extension MainViewController: MainViewDelegate {
     }
 }
 
-//MARK: - AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate
-extension MainViewController: AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate {
-    
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard let imageData = photo.fileDataRepresentation() else { return }
-        guard let originalImage = UIImage(data: imageData) else { return }
-        
-        appendOriginalImage(image: originalImage)
-        mainView.updateThumbnail(image: originalImage, imagesCount: scanServiceProvider.originalImages.count)
-        
-    }
-    
+//MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
+extension MainViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
         guard let pixelBuffer: CVPixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }

@@ -25,7 +25,6 @@ final class MainView: UIView {
     
     private let captureSession = AVCaptureSession()
     private var previewLayer = AVCaptureVideoPreviewLayer()
-    private let photoOutput = AVCapturePhotoOutput()
     private let videoOutput = AVCaptureVideoDataOutput()
     private let alphaLayer = CAShapeLayer()
     
@@ -44,7 +43,6 @@ final class MainView: UIView {
         
         configureCaptureSassion()
         configurePreviewLayer()
-        configurePhotoOutput()
         configureVideoOutput()
     }
     
@@ -206,19 +204,6 @@ extension MainView {
         cameraView.layer.addSublayer(alphaLayer)
     }
     
-    private func configurePhotoOutput() {
-        do {
-            if captureSession.canAddOutput(photoOutput) {
-                captureSession.addOutput(photoOutput)
-            } else {
-                throw CameraError.cantAddPhotoOutput
-            }
-        } catch {
-            delegate?.cantAddCameraViewAction()
-            print(error)
-        }
-    }
-    
     func configureVideoOutput() {
         do {
             guard let delegate = delegate,
@@ -248,12 +233,7 @@ extension MainView {
 extension MainView {
     
     @objc private func capture() {
-//         guard let delegate = delegate,
-//               let photoCaptureDelegate = delegate as? AVCapturePhotoCaptureDelegate else { return }
-//         let settings = AVCapturePhotoSettings()
-//         photoOutput.capturePhoto(with: settings, delegate: photoCaptureDelegate)
         delegate?.appendVideoFrameImage()
-        
      }
     
     @objc private func pushThumbnailView() {
