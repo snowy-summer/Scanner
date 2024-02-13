@@ -56,7 +56,6 @@ extension ScanServiceProvider {
     }
     
     func getCorrectPerspectiveImage(image: UIImage, rectPoints: [CGPoint]) throws -> UIImage {
-
         guard let ciImage = image.ciImage else { throw ScannerError.convertToCIImageError }
         
         let outputImage = try rectangleDetector.getPrepectiveImage(ciImage: ciImage, points: rectPoints)
@@ -64,6 +63,7 @@ extension ScanServiceProvider {
         guard let cgImage = context.createCGImage(outputImage, from: outputImage.extent) else { throw ScannerError.failToCreateCGImage }
         return UIImage(cgImage: cgImage)
     }
+    
     
     
 }
@@ -94,8 +94,13 @@ extension ScanServiceProvider {
         let scaleX = imageSize.width / viewSize.width
         let scaleY = imageSize.height / viewSize.height
         
-        let adjustedPoints = rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
-        
-        return adjustedPoints
+        return rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
+    }
+    
+    func fitToCICoordinate(rectPoints: [CGPoint], imageSize: CGSize, ciImageSize: CGSize) -> [CGPoint] {
+        let scaleX = ciImageSize.width / imageSize.width
+        let scaleY = ciImageSize.height / imageSize.height
+
+        return rectPoints.map { CGPoint(x: $0.x * scaleX, y: ciImageSize.height - ($0.y * scaleY)) }
     }
 }

@@ -51,7 +51,7 @@ extension RepointViewController {
                                          target: self,
                                          action: #selector(doneAction))
        
-       let backButton = UIBarButtonItem(image: UIImage(systemName: "arrowshape.backward"),
+       let backButton = UIBarButtonItem(image: UIImage(systemName: "arrowshape.backward.fill"),
                                          style: .plain,
                                          target: self,
                                          action: #selector(undoAction))
@@ -61,15 +61,22 @@ extension RepointViewController {
     }
 }
 
-//MARK: - objc Action method
-
 extension RepointViewController {
     @objc private func doneAction() {
         do {
             let rectPoints = repointView.getRectPoints()
-            guard let beforeImage = repointView.imageView.image else { return }
-            let image = try scanServiceProvider.getCorrectPerspectiveImage(image: beforeImage, rectPoints: rectPoints)
-            repointView.updateUI(image: image)
+            let beforeImage = scanServiceProvider.originalImages[scanServiceProvider.currentIndex]
+            let imageSize = repointView.imageView.bounds.size
+            
+            guard let ciImage = beforeImage.ciImage else { return }
+            
+            let adjustedRectPoints = scanServiceProvider.fitToCICoordinate(rectPoints: rectPoints,
+                                                                           imageSize: imageSize,
+                                                                           ciImageSize: ciImage.extent.size)
+            
+            let image = try scanServiceProvider.getCorrectPerspectiveImage(image: beforeImage, rectPoints: adjustedRectPoints)
+            scanServiceProvider.changeImage(image: image, at: scanServiceProvider.currentIndex) 
+            undoAction()
         } catch {
             print(error)
         }
@@ -78,9 +85,7 @@ extension RepointViewController {
     @objc private func undoAction() {
         navigationController?.popViewController(animated: true)
     }
-}
-
-extension RepointViewController {
+    
     private func drawRectOnRepointView(image: UIImage) {
         do {
             let viewSize = repointView.imageView.bounds.size

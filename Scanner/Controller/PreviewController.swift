@@ -34,6 +34,8 @@ final class PreviewController: UIViewController {
         navigationController?.isToolbarHidden = false
         navigationController?.navigationBar.isHidden = false
         
+        preview.updateImageView(image: scanServiceProvider.scannedImages[scanServiceProvider.currentIndex])
+        
     }
     
     override func viewDidLoad() {
