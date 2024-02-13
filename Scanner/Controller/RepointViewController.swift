@@ -29,17 +29,15 @@ final class RepointViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .gray
-        guard let image = scanServiceProvider.originalImages.last else { return }
         navigationController?.isToolbarHidden = true
         
-        repointView.updateUI(image: image)
+        repointView.updateUI(image: scanServiceProvider.originalImages[scanServiceProvider.currentIndex])
         setupNavigationBarButton()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        guard let image = scanServiceProvider.originalImages.last else { return }
-        drawRectOnRepointView(image: image)
+        drawRectOnRepointView(image: scanServiceProvider.originalImages[scanServiceProvider.currentIndex])
     }
 }
 
@@ -86,11 +84,19 @@ extension RepointViewController {
     private func drawRectOnRepointView(image: UIImage) {
         do {
             let viewSize = repointView.imageView.bounds.size
-            
             let points = try scanServiceProvider.getDetectedRectanglePoint(image: image, viewSize: viewSize)
             repointView.drawRect(cgPoints: points)
             
         } catch {
+            
+            let viewSize = repointView.imageView.bounds.size
+            let points = [
+                CGPoint(x: viewSize.width * 0.2, y: viewSize.height * 0.2),
+                CGPoint(x: viewSize.width * 0.8, y: viewSize.height * 0.2),
+                CGPoint(x: viewSize.width * 0.8, y: viewSize.height * 0.8),
+                CGPoint(x: viewSize.width * 0.2, y: viewSize.height * 0.8),
+            ]
+            repointView.drawRect(cgPoints: points)
             print(error)
         }
     }

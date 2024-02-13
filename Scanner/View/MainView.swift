@@ -147,7 +147,7 @@ extension MainView {
         ]
         
         NSLayoutConstraint.activate(imageCountViewConstraint)
-        DispatchQueue.main.async { [weak self] in
+        mainQueue.async { [weak self] in
             guard let self = self else { return }
             NSLayoutConstraint.activate([
                 imageCountView.leadingAnchor.constraint(equalTo: thumbnailView.trailingAnchor, constant: -(imageCountView.bounds.width / 2)),
@@ -201,7 +201,7 @@ extension MainView {
     
     private func configurePreviewLayer() {
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.videoGravity = .resize
         cameraView.layer.addSublayer(previewLayer)
         cameraView.layer.addSublayer(alphaLayer)
     }

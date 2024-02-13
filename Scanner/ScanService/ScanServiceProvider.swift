@@ -12,6 +12,7 @@ final class ScanServiceProvider {
     private let rectangleDetector = RectangleDetector()
     private(set) var originalImages: [UIImage] = []
     private(set) var scannedImages: [UIImage] = []
+    var currentIndex = 0
     
     //MARK: - Test용 데이터 메소드
     
@@ -39,12 +40,12 @@ extension ScanServiceProvider {
         let scannedImage = try detectRectangleAndCorrectPerspective(image: image)
         scannedImages.append(scannedImage)
     }
+    
     func appendOriginalImage(image: UIImage) {
         scannedImages.append(image)
     }
     
     private func detectRectangleAndCorrectPerspective(image: UIImage) throws -> UIImage {
-//        guard let ciImage = CIImage(image: image) else { throw ScannerError.convertToCIImageError }
         guard let ciImage = image.ciImage else { throw ScannerError.convertToCIImageError }
         
         let rectangleFeature = try rectangleDetector.detecteRectangle(ciImage: ciImage)
@@ -94,8 +95,6 @@ extension ScanServiceProvider {
         let scaleY = imageSize.height / viewSize.height
         
         let adjustedPoints = rectanglePoints.map { CGPoint(x: $0.x / scaleX, y: viewSize.height - ($0.y / scaleY)) }
-//        adjustedPoints[0].y -= 22
-//        adjustedPoints[1].y -= 22
         
         return adjustedPoints
     }

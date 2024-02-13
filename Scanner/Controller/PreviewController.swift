@@ -43,6 +43,7 @@ final class PreviewController: UIViewController {
         setupToolBarButton()
         configurePreView()
         changeNavigationTitle()
+        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.black]
     }
 }
 
@@ -68,7 +69,7 @@ extension PreviewController {
                                             target: nil,
                                             action: nil)
         
-        let rotateButton = UIBarButtonItem(title: "반시계",
+        let rotateButton = UIBarButtonItem(image: UIImage(systemName: "rotate.right"),
                                            style: .plain,
                                            target: self,
                                            action: #selector(rotateAction))
@@ -112,6 +113,7 @@ extension PreviewController {
             cantPushRepointViewControllerAlert()
             return
         }
+        scanServiceProvider.currentIndex = preview.pageControl.currentPage
         navigationController?.pushViewController(RepointViewController(scanServiceProvider: scanServiceProvider), animated: true)
     }
     
