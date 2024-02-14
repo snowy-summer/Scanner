@@ -56,7 +56,6 @@ extension Preview {
         ])
         pageControl.currentPage = 0
         pageControl.isUserInteractionEnabled = true
-        pageControl.pageIndicatorTintColor = UIColor.lightGray
         pageControl.currentPageIndicatorTintColor = UIColor.black
     }
     

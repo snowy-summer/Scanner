@@ -28,7 +28,7 @@ final class RepointViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .gray
+        view.backgroundColor = UIColor(resource: .background)
         navigationController?.isToolbarHidden = true
         
         repointView.updateUI(image: scanServiceProvider.originalImages[scanServiceProvider.currentIndex])

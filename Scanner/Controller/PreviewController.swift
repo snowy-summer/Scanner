@@ -41,7 +41,7 @@ final class PreviewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .gray
+        view.backgroundColor = UIColor(resource: .background)
         preview.delegate = self
         setupToolBarButton()
         configurePreView()
