@@ -21,7 +21,6 @@ final class RepointViewController: UIViewController {
     }
     
     override func loadView() {
-        super.loadView()
         view = repointView
     }
     

@@ -21,7 +21,6 @@ final class MainViewController: UIViewController {
     
     
     override func loadView() {
-        super.loadView()
         view = mainView
     }
     

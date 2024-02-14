@@ -25,7 +25,6 @@ final class PreviewController: UIViewController {
     }
     
     override func loadView() {
-        super.loadView()
         view = preview
     }
     
